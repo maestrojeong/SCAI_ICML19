@@ -290,7 +290,7 @@ TC(z)=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace
 \begin{itemize}\itemsep=12pt
 \item We denote our method without the discrete variables as \textbf{CascadeVAE-C}.
 \item We denote our full method as \textbf{CascadeVAE}. 
-\item We evaluate with disentanglement score introduced in \textbf{FactorVAE} \footnote{{\color{blue}{Kim, H. and Mnih, A.}} Disentangling by factorising. {\color{gray}{ICML2018}}} and unsupervised classification.
+\item We evaluate with disentanglement score introduced in \textbf{FactorVAE} \footnote{{\color{blue}{Kim, H. and Mnih, A.}} Disentangling by factorising. {\color{gray}{ICML2018}}} and unsupervised classification accuracy.
 \item Baselines are \textbf{$\beta$-VAE, JointVAE, FactorVAE}
 \end{itemize}
 \end{frame}
@@ -391,7 +391,7 @@ CascadeVAE &6&\textbf{78.84 (15.65)}& \textbf{99.66}\\
 \end{column}
 \begin{column}{0.4\textwidth}
 \begin{itemize}\itemsep=12pt
-\item {\color{blue}{Unsupervised classification}} results when size of discrete variable is 3.
+\item {\color{blue}{Unsupervised classification accuracy}} when size of discrete variable is 3.
 \item Unsupervised classification accuray for random chance is $33.33$.
 \end{itemize}
 
@@ -513,7 +513,7 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 \end{column}
 \begin{column}{0.4\textwidth}
 \begin{itemize}\itemsep=12pt
-\item {\color{blue}{Unsupervised classification}} results  when size of discrete variable is 10.
+\item {\color{blue}{Unsupervised classification accuracy}} when size of discrete variable is 10.
 \item Unsupervised classification accuray for random chance is $10.00$.
 \end{itemize}
 
