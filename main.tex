@@ -78,6 +78,7 @@
 \newcommand{\INPUT}{\item[\algorithmicinput]}
 \newcommand{\OUTPUT}{\item[\algorithmicoutput]}
 
+\setbeamertemplate{theorems}[numbered]
 \newtheorem{thm}{Theorem}
 \newtheorem{defn}{Definition}
 \newtheorem{prop}{Proposition}
@@ -110,35 +111,40 @@
 
 \begin{frame}
 \frametitle{Disentanglement}
-\begin{columns}
-\begin{column}{0.5\textwidth}
 \begin{figure}
-\includegraphics[width=\linewidth]{disentanglement}
+\centering
+\includegraphics[width=0.6\linewidth]{disentanglement}
 \end{figure}
-\end{column}
-\begin{column}{0.5\textwidth}
-\begin{itemize}\itemsep=12pt
-\item Wikipedia says ``Extrication from twists, tangles, complications".
-\end{itemize}
-\end{column}
-\end{columns}
+\end{frame}
 
+\begin{frame}
+\frametitle{Motivation}
+
+\begin{figure}
+\centering
+\only<1>{\includegraphics[page=1, width=\linewidth]{motivation}}%
+\only<2>{\includegraphics[page=2, width=\linewidth]{motivation}}%
+\only<3>{\includegraphics[page=3, width=\linewidth]{motivation}}%
+\only<4>{\includegraphics[page=4, width=\linewidth]{motivation}}%
+\only<5>{\includegraphics[page=5, width=\linewidth]{motivation}}%
+\only<6>{\includegraphics[page=6, width=\linewidth]{motivation}}%
+\only<7>{\includegraphics[page=7, width=\linewidth]{motivation}}%
+\end{figure}
 \end{frame}
 
 \begin{frame}
 \frametitle{Motivation}
 \begin{itemize}\itemsep=20pt
 \item Our interest is to {\color{blue}{disentangle}} the underlying explanatory factors of data {\color{blue}{without any supervision.}}\pause
-\item We require a stable disentanglement framework to capture {\color{blue}{continuous}} and {\color{blue}{discrete}} factors.\pause
-\item {\color{blue}{VAE}} framework guarantees a stable framework compared to GAN framework.
+\item We require a stable disentanglement framework to capture {\color{blue}{continuous}} and {\color{blue}{discrete}} factors.
+%%\pause\item {\color{blue}{VAE}} framework guarantees a stable framework compared to GAN framework.
 \end{itemize}
 \end{frame}
-
 
 \begin{frame}
 \frametitle{Contributions}
 \begin{itemize}\itemsep=20pt
-\item We propose a simple procedure for penalizing the {\color{blue}{total correlation}} without any extra {\color{blue}{discriminator network}}\footnote{{\color{blue}{Kim, H. and Mnih, A.}} Disentangling by factorising. {\color{gray}{ICML2018}}} or {\color{blue}{importance sampling}} \footnote{{\color{blue}{Chen, T. Q., Li, X., Grosse, R. B., and Duvenaud, D. K.}} Isolating sources of disentanglement in variational autoencoders. {\color{gray}{NIPS2018}}} in the {\color{blue}{$\beta$-VAE}} \footnote{{\color{blue}{Higgins, I., Matthey, L., Pal, A., Burgess, C., Glorot, X., Botvinick, M., Mohamed, S., and Lerchner, A.}} beta-vae: Learning basic visual concepts with a constrained variational framework. {\color{gray}{ICLR2017}}} framework.\pause
+        \item We propose a simple procedure for penalizing the {\color{blue}{total correlation}} without any extra {\color{blue}{discriminator network(FactorVAE)}}\footnote{{\color{blue}{Kim, H. and Mnih, A.}} Disentangling by factorising. {\color{gray}{ICML2018}}} or {\color{blue}{importance sampling}} \footnote{{\color{blue}{Chen, T. Q., Li, X., Grosse, R. B., and Duvenaud, D. K.}} Isolating sources of disentanglement in variational autoencoders. {\color{gray}{NIPS2018}}} in the {\color{blue}{$\beta$-VAE}} \footnote{{\color{blue}{Higgins, I., Matthey, L., Pal, A., Burgess, C., Glorot, X., Botvinick, M., Mohamed, S., and Lerchner, A.}} beta-vae: Learning basic visual concepts with a constrained variational framework. {\color{gray}{ICLR2017}}} framework.\pause
 \item We propose an {\color{blue}{alternating disentanglement method}} to disentangle discrete and continuous factors without lumping both the continuous and discrete factors into a single latent vector.
 \end{itemize}
 \end{frame}
@@ -153,7 +159,7 @@
 \begin{align}
 \mathcal{L}(\theta,\phi) = \mathbb{E}_{x \sim p(x)} \big[&\mathbb{E}_{z \sim q_\phi(z \mid x)} \log p_\theta(x \mid z)- \beta D_\text{KL}\left(q_\phi(z \mid x) \parallel p(z)\right)\big],\nonumber
 \end{align}
-where $p(z)$ is the fully factorized standard normal prior.\pause
+where $p(z)$ is the fully factorized standard normal prior.
 %%\item Maximizing the objective can be viewed as maximizing the lower bound on the mutual information between the data $x$ and the latent code $z$ with the KL term.
 %%\begin{align}
 %%    I(x;z) - \beta \mathbb{E}_{x\sim p(x)}D_\text{KL}(q_\phi(z\mid x) \parallel p(z)) \nonumber
@@ -169,7 +175,7 @@ where $p(z)$ is the fully factorized standard normal prior.\pause
 &\mathbb{E}_{x \sim p(x)} D_\text{KL}(q(z| x) ~||~ p(z))\nonumber \\
 &~~~=I(x;z) + \underbrace{D_\text{KL}(q(z) \parallel \prod_j q(z_j))}_{=~\text{Total correlation},~ TC(z)} + \sum_j D_\text{KL}(q(z_j) \parallel p(z_j)),\nonumber
 \end{align}
-where $q(z)$\footnote{$q(z) = \mathbb{E}_{x\sim p(x)} q(z\mid x)$} denotes the marginal posterior. 
+        where $q(z)(=\mathbb{E}_{p(x)}[q(z\!\mid\!x)])$ denotes the marginal posterior. 
 \end{itemize}
 \end{frame}
 
@@ -177,8 +183,12 @@ where $q(z)$\footnote{$q(z) = \mathbb{E}_{x\sim p(x)} q(z\mid x)$} denotes the m
 \frametitle{Total Correlation $TC(z)$}
 \begin{itemize}\itemsep=20pt
 \item Total correlation or $TC(z)$ is a popular measure quantifying the redundancy among a set of $m$ random variables. \pause
-\item Multivariate version of mutual information $I(\cdot, \cdot)$\footnote{$I(z_1,z_2)= D_\text{KL}(q(z_1,z_2) \parallel q(z_1)q(z_2))=TC(z_{1,2})$}. \pause
-\item {\color{blue}{Penalizing TC}} leads the model to learn {\color{blue}{statistically independent factors}} in the data which is a crucial component in disentangled representations. 
+\item Multivariate version of mutual information $I(\cdot, \cdot)$
+\begin{align}
+I(z_1,z_2)= D_\text{KL}(q(z_1,z_2) \parallel q(z_1)q(z_2))=TC(z_{1:2})\nonumber
+\end{align}
+        \vspace{-2em}
+\pause \item {\color{blue}{Penalizing TC}} leads the model to learn {\color{blue}{statistically independent factors}} in the data which is a crucial component in disentangled representations. 
 %%\begin{align}
 %%TC(z) = D_\text{KL}(q(z) \parallel \prod_j q(z_j)),\nonumber
 %%\end{align}
@@ -203,13 +213,32 @@ where $q(z)$\footnote{$q(z) = \mathbb{E}_{x\sim p(x)} q(z\mid x)$} denotes the m
 \end{frame}
 
 \begin{frame}
+\frametitle{Overview of our method}
+\begin{figure}
+\includegraphics[page=2, width=\linewidth]{arch}
+\end{figure}
+\end{frame} 
+
+\begin{frame}
+\frametitle{Our method}
+\begin{prop}
+The mutual information between a single random variable and the rest can be factorized as
+\[I(z_{1:i-1}; z_i) = TC(z_{1:i}) - TC(z_{1:i-1})\]
+\end{prop}
+\begin{prop}
+The mutual information between $x$ and partitions of $z = [z_1, z_2]$ can be factorized as,
+\[I(x; [z_1, z_2]) = I(x;z_1) + I(x; z_2) - I(z_1; z_2)\]
+\end{prop}
+\end{frame}
+
+\begin{frame}
 \frametitle{Our method}
 \begin{itemize}\itemsep=12pt
-        \item \[TC(z) = \sum_{i=2}^m I(z_{1:i-1}; z_i) ~~~~\footnote{
+\item By proposition1,
 \begin{align}
-TC(z)=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace{TC(z_{1:i}) - TC(z_{1:i-1})}_{= I(z_{1:i-1}; z_i)} \right)\nonumber
-\end{align} \nonumber
-            }\]
+TC(z)&=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace{TC(z_{1:i}) - TC(z_{1:i-1})}_{= I(z_{1:i-1}; z_i)} \right)\nonumber\\
+&= \sum_{i=2}^m I(z_{1:i-1}; z_i).\nonumber
+\end{align}
 \pause
 \item We aim at penalizing $TC(z)$ by sequentially penalizing the individual summand $I(z_{1:i-1};z_i)$.
 \end{itemize}
@@ -218,10 +247,13 @@ TC(z)=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace
 \begin{frame}
 \frametitle{Our method}
 \begin{itemize}\itemsep=20pt
-\item 
-\[I(x;z_{1:i}) = I(x;z_{1:i-1}) + I(x;z_{i}) - I(z_{1:i-1};z_{i})\]
-\item This factorization motivates a maximization algorithm sequentially updating the left hand side $I(x; z_{1:i})$ for all $i=2,\ldots,m$ which in turn minimizes each summand, $I(z_{i-1};z_i)$.\pause
-\item Sequentially, we maximize $I(x;z_{1:i})$ by penalizing $z_{i+1:m}$ with high $\beta$($\beta_h$) and the others with small $\beta$($\beta_l$).
+\item By proposition2,
+\begin{align}
+&I(x;z_{1:i}) = I(x;z_{1:i-1}) + I(x;z_{i}) - I(z_{1:i-1};z_{i}).\nonumber\\
+&~~~~\onslide<2->{\uparrow} \only<1>{\qquad\qquad\quad\uparrow} \onslide<2->{\qquad\qquad\quad\bullet\quad\qquad\qquad\uparrow\qquad\qquad\quad\downarrow}\nonumber
+\end{align}
+\item This factorization motivates a maximization algorithm sequentially updating the left hand side $I(x; z_{1:i})$ for all $i=2,\ldots,m$ which in turn minimizes each summand, $\mathbf{I(z_{i-1};z_i)}$.
+\onslide<3->{\item Sequentially, we maximize $I(x;z_{1:i})$ by penalizing $z_{i+1:m}$ with high $\beta$($\beta_h$) and the others with small $\beta$($\beta_l$).}
 \end{itemize}
 \end{frame}
 
@@ -232,11 +264,9 @@ TC(z)=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace
 \only<2>{\includegraphics[page=2, width=\linewidth]{arch}}%
 \only<3>{\includegraphics[page=3, width=\linewidth]{arch}}%
 \only<4>{\includegraphics[page=4, width=\linewidth]{arch}}%
-\only<5>{\includegraphics[page=5, width=\linewidth]{arch}}
 \end{figure}
 \begin{itemize}
-\only<1>{\item Every latent dimensions are heavily penalized with $\beta_h$.}
-\onslide<2->{\item Each penalty on latent dimension is sequentially relieved one at a time with $\beta_l$ in a cascading fashion.}
+\item Every latent dimensions are heavily penalized with $\beta_h$. Each penalty on latent dimension is sequentially relieved one at a time with $\beta_l$ in a cascading fashion.
 \end{itemize}
 \end{frame} 
 
@@ -245,52 +275,145 @@ TC(z)=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace
 \begin{figure}[bp]
 \centering
 \includegraphics[width=1.0\linewidth]{graphical_model.png}
-\caption{Graphical models view of $\beta$-VAE, JointVAE, AAE with supervised discrete variables, and our method. Solid lines denote the generative process and the dashed lines denote the inference process. $x,z,d$ denotes the data, continuous latent code, and the discrete latent code respectively.}
+    \caption{Graphical models view of $\beta$-VAE, JointVAE, AAE with supervised discrete variables(AAE-S), and our method. Solid lines denote the generative process and the dashed lines denote the inference process. $x,z,d$ denotes the data, continuous latent code, and the discrete latent code respectively.}
 \end{figure}
 \end{frame} 
 
 \begin{frame}
+\frametitle{Joint distribution}
+\begin{itemize}
+\item JointVAE
+\begin{align}
+    q(z,x,d) = p(x)q(z,d|x)\nonumber
+\end{align}
+\item AAE-S
+\begin{align}
+    q(z,x,d) = \begin{cases}p(x)q(z|x) & \text{if $d=y$} \\ 0 & \text{otherwise}\end{cases},\nonumber
+\end{align}where $y$ is a provided ground truth discrete factors through supervision.
+\item CascadeVAE
+\begin{align}
+    q(z,x,d) = \begin{cases}p(x)q(z|x) & \text{if $d = \argmax_{\hat{d}} p(x|z,\hat{d})$} \\0 &\text{otherwise}\end{cases}\nonumber
+\end{align}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
 \frametitle{Drawbacks of JointVAE}
 \begin{itemize}\itemsep=12pt
+\item 
+\begin{align}
+    q(z,x,d) = p(x)q(z,d|x)\nonumber
+\end{align}
 \item JointVAE can be viewed as  augmenting the continuous latent variables with discrete latent variables ($z=[z'; d]$) in the $\beta$-VAE framework.\pause
 \item However, simply lumping the latent variables together offloads the entire burden of jointly modeling both the continuous and discrete factors to the variational posterior which can be very challenging.
 \end{itemize}
 \end{frame} 
 
 \begin{frame}
-\frametitle{AAE with supervision}
+\frametitle{AAE-S}
 \begin{itemize}\itemsep=12pt
-\item AAE have investigated learning continuous latent representations while providing the discrete factors through supervision\footnote{Class labels in MNIST}.\pause
-\item Model can learn drastically better continuous representations when the burden of simultaneously modeling the continuous and discrete factors is relieved.\pause
+\item
+\begin{align}
+    q(z,x,d) = \begin{cases}p(x)q(z|x) & \text{if $d=y$} \\ 0 & \text{otherwise}\end{cases},\nonumber
+\end{align}where $y$ is a provided ground truth discrete factors through supervision.
+\item AAE have investigated learning continuous latent representations while providing the discrete factors through supervision(e.g. class labels in MNIST).\pause
+\item Model can learn drastically better continuous representations when the burden of simultaneously modeling the continuous and discrete factors is relieved.
+\end{itemize}
+\end{frame} 
+
+\begin{frame}
+\frametitle{Our method}
+\begin{itemize}\itemsep=12pt
+\item
+\begin{align}
+    q(z,x,d) = \begin{cases}p(x)q(z|x) & \text{if $d = \argmax_{\hat{d}} p(x|z,\hat{d})$} \\0 &\text{otherwise}\end{cases}\nonumber
+\end{align}
 \item Inspired by these findings, our idea is to alternate between finding the most likely discrete configuration of the variables given the continuous factors, and updating the parameters ($\phi,\theta$) given the discrete configurations. 
 \end{itemize}
 \end{frame} 
 
-%%\begin{frame}
-%%\frametitle{Our method}
-%%\begin{itemize}
-%%\item 
-%% We define the joint distribution of the variables as 
-%%\begin{align}
-%%    q_{\phi,\theta}(x,z,d)=\begin{cases} q_\phi(x,z) & \text{if}~d=\argmax_{\hat{d}} p_\theta(x \mid z,\hat{d})\\ 0 & \text{otherwise} \end{cases} \nonumber,
-%%\end{align}
-%%where $q_\phi(x,z)=p(x)q_\phi(z\mid x)$.
-%%\item 
-%%Likewise, the variational posterior is defined as,
-%%\begin{align}
-%%    q_{\theta,\phi}(z,d\mid x)=\begin{cases} q_\phi(z\mid x) & \text{if}~d=\argmax_{\hat{d}} p_\theta(x\mid z,\hat{d})\\ 0 & \text{otherwise} \end{cases}\nonumber
-%%\end{align}
-%%\end{itemize}
-%%\end{frame} 
+\begin{frame}
+\frametitle{Alternating minimization scheme}
+    \begin{itemize}
+\item Our goal is to maximize the variational lower bound of the following objective,
+\small
+\begin{align}
+&\mathcal{L}(\theta,\phi)=I(x; [z,d]) - \beta \mathbb{E}_{x\sim p(x)} D_\text{KL}(q_\phi(z \mid x) \parallel p(z))-\lambda D_\text{KL} (q(d) \parallel p(d))\nonumber\\
+& \geq H(x)+\int \sum_d q(x,z,d) \log q_{\theta, \phi}(x|z,d) dz dx\nonumber\\
+&~~-\beta \mathbb{E}_{x\sim p(x)} D_\text{KL}(q_\phi(z \mid x) \parallel p(z)) - \lambda D_\text{KL} (q(d) \parallel p(d))\nonumber\\
+&\geq H(x)+\mathbb{E}_{x\sim p(x)}[\mathbb{E}_{z,d\sim q_{\phi, \theta}(\cdot | x)}[\log p_{\theta}(x|z,d)]]\nonumber\\
+&\quad-\beta \mathbb{E}_{x\sim p(x)} D_\text{KL}(q_\phi(z \mid x) \parallel p(z))- \lambda (S\mathbb{E}_{d, d' \sim q(d)}[\mathds{1}(d=d')]-1).\nonumber
+\end{align}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Alternating minimization scheme}
+\begin{itemize}\itemsep=12pt
+\item Note the lower bound has an inner maximization step over the discrete factors embedded in the variational posterior.
+\item Data is sampled $x^{(i)} \in \mathcal{X}, i=1, \ldots, n$.
+\item The continuous latent variables($z^{(i)}$) are samples from the decoder $q_\phi(\cdot \mid x^{(i)})$. 
+\item The discrete latent variables are represented using one-hot encodings of each variables $d^{(i)} \in \{e_1, \ldots, e_S\}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Alternating minimization scheme}
+\begin{itemize}
+\item
+    After rearranging the terms, we arrive at the following optimization problem.
+\begin{align}
+\label{eqn:master_eqn}
+&\maximize_{\theta, \phi} \left(\underbrace{\maximize_{d^{(1)},\ldots d^{(n)}} \sum_{i=1}^n {u_\theta^{(i)}}^\intercal d^{(i)} - \lambda' \sum_{i\neq j} {d^{(i)}}^\intercal d^{(j)}}_{:= \mathcal{L}_{LB}(\theta, \phi)} \right)\nonumber\\
+&\qquad\qquad\quad - \beta \sum_{i=1}^n D_{KL}(q_\phi(z|x^{(i)})||p(z))\nonumber\\
+&\text{\ \  subject to }~~ \| d^{(i)} \|_1 = 1,~ d^{(i)} \in \{0,1\}^S,~ \forall i, \nonumber
+\end{align}
+where $u_\theta^{(i)}$ denotes the vector of the  likelihood $\log p_\theta(x^{(i)}|z^{(i)}, e_k)$ evaluated at each $k \in [S]$.
+        
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Alternating minimization scheme}
+\begin{itemize}
+    \item The inner maximization problem $\mathcal{L}_{LB}(\theta, \phi)$  over the discrete variables $[d^{(1)},\ldots,d^{(n)}]$ subject to the sparsity equality constraints can be exactly solved in polynomial time via \emph{minimum cost flow}(mcf) without  continuous relaxation \footnote{ {\color{blue}{Jeong, Y. and Song, H. O.}} Efficient end-to-end learning for quantizable representations. {\color{gray}{ICML2018}} }. 
+\end{itemize}
+\end{frame}
+
 
 \section{Experiments}
+\begin{frame}
+\frametitle{Pseudocode}
+\begin{algorithm}[H]
+\caption{CascadeVAE}
+\footnotesize
+\begin{algorithmic}[1]
+\INPUT Data $\{x^{(i)}\}_{i=1}^N$, Encoder($q_\phi$), Decoder($p_\theta$), $\beta_l, \beta_h$, $r, t_d$, optimizer $g$
+\STATE Initialize parameters $\phi, \theta$.
+\STATE Set $\beta_j=\beta_h,~$ $\forall j$ and $d^{(i)}=0,$ $~~\forall i\in [N]$
+\STATE Set $j=1$.
+\FOR{$t=1,\ldots,$MAXITER}
+\STATE \textbf{if} $t$ is a multiple of $r$
+\STATE $~~~$Switch $\beta_j$ to $\beta_l$ and $j\leftarrow j+1$
+\STATE Randomly select batch $\{x^{(i)}\}_{i \in \mathcal{B}}$
+\STATE Sample $z^{(i)}_\phi \sim q_{\phi}(z|x^{(i)})$ $\forall i \in \mathcal{B}$ 
+\STATE \textbf{if} $t>t_d$
+\STATE $~~~$ Update $u_\theta^{(i)}$ by computing $\log p_\theta(x^{(i)}|z^{(i)}, e_k)$ $\forall k$
+\STATE $~~~$ Compute $\mathcal{L}_{LB}(\theta, \phi)$ by solving for the optimal \\
+\qquad assignment $\{d^{(i)}\}_{i\in \mathcal{B}}$ via minimum cost flow 
+\STATE $\theta, \phi \leftarrow g\left(\nabla_{\theta,\phi} \mathcal{L}_{LB}(\theta,\phi)\right)$
+\ENDFOR
+\end{algorithmic}
+\end{algorithm}
+\end{frame}
+
 
 \begin{frame}
 \frametitle{Notation}
 \begin{itemize}\itemsep=12pt
 \item We denote our method without the discrete variables as \textbf{CascadeVAE-C}.
 \item We denote our full method as \textbf{CascadeVAE}. 
-\item We evaluate with disentanglement score introduced in \textbf{FactorVAE} \footnote{{\color{blue}{Kim, H. and Mnih, A.}} Disentangling by factorising. {\color{gray}{ICML2018}}} and unsupervised classification accuracy.
+\item We evaluate with disentanglement score introduced in \textbf{FactorVAE} and unsupervised classification accuracy.
 \item Baselines are \textbf{$\beta$-VAE, JointVAE, FactorVAE}
 \end{itemize}
 \end{frame}
@@ -315,7 +438,7 @@ TC(z)=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace
 \end{column}
 \begin{column}{0.65\textwidth}
 \begin{itemize}\itemsep=26pt
-\item Shape: square, ellipse, heart
+\item Shape: square, ellipse, heart{\color{red}{(discrete)}}
 \item Scale: 6 values linearly spaced in $[0.5, 1]$
 \item Orientation: 40 values in $[0, 2\pi]$
 \item Position X: 32 values in $[0, 1]$
@@ -340,12 +463,12 @@ TC(z)=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace
 \multicolumn{1}{c}{Method}&m&\multicolumn{1}{c}{Mean (std)}&\multicolumn{1}{c}{Best}\\
 \toprule
 $\beta$ VAE\\($\beta=10.0$)& 5 & 70.11 (7.54)&84.62\\
-($\beta=4.0$)& 10 &74.41 (7.68)&\textbf{88.38}\\
+($\beta=4.0$)& 10 &74.41 (7.68)&88.38\\
 \midrule
 FactorVAE& 5  &81.09 (2.63)&85.12\\
-        & 10 &\textbf{82.15 (0.88)}&88.25\\
+        & 10 &82.15 (0.88)&88.25\\
 \midrule
-CascadeVAE-C\\($\beta_l=0.7$)& 5  &81.69 (3.14)&\textbf{88.38}\\
+CascadeVAE-C\\($\beta_l=0.7$)& 5  &81.69 (3.14)&88.38\\
     ($\beta_l=1.0$)& 10 &81.74 (2.97)&87.38\\
 \midrule
 \midrule
@@ -358,7 +481,7 @@ CascadeVAE\\($\beta_l=1.0$)& 6 &90.49 (5.28)&\textbf{99.50}\\
 \end{tabular}
 \end{table}
 \end{column}
-\begin{column}{0.4\textwidth}
+\begin{column}{0.35\textwidth}
 \begin{itemize}\itemsep=12pt
 \item {\color{blue}{Disentanglement score}} is obtained from 10 different random seed each with the best hyperparameters. 
 \item $m$ is the number of continous latent dimensions.
@@ -419,7 +542,9 @@ CascadeVAE &6&\textbf{78.84 (15.65)}& \textbf{99.66}\\
 \begin{frame}
 \frametitle{DSprites gif animation}
 \begin{itemize}\itemsep=8pt
-\item $\beta$-VAE
+\item $\beta$-VAE\\
+$\mathbf{\qquad\quad z_1\qquad\qquad~z_2\qquad\qquad~z_3\qquad\qquad~z_4\qquad\qquad~~z_5}$
+\vspace{-0.6em}
 \begin{figure}
 \centering
 \only<1>{\includegraphics[width=0.9\textwidth,center]{vae_gif/vae-0.png}}%
@@ -433,7 +558,9 @@ CascadeVAE &6&\textbf{78.84 (15.65)}& \textbf{99.66}\\
 \only<9>{\includegraphics[width=0.9\textwidth,center]{vae_gif/vae-40.png}}%
 \only<10>{\includegraphics[width=0.9\textwidth,center]{vae_gif/vae-45.png}}
 \end{figure}
-\item FactorVAE
+\item FactorVAE\\
+$\mathbf{\qquad\quad z_1\qquad\qquad~z_2\qquad\qquad~z_3\qquad\qquad~z_4\qquad\qquad~~z_5}$
+\vspace{-0.6em}
 \begin{figure}
 \only<1>{\includegraphics[width=0.9\textwidth,center]{factor_gif/factor-0.png}}%
 \only<2>{\includegraphics[width=0.9\textwidth,center]{factor_gif/factor-5.png}}%
@@ -452,7 +579,18 @@ CascadeVAE &6&\textbf{78.84 (15.65)}& \textbf{99.66}\\
 \begin{frame}
 \frametitle{DSprites gif animation}
 \begin{itemize}\itemsep=8pt
-\item JointVAE
+\item JointVAE\\
+\end{itemize}
+\begin{columns}
+\begin{column}{0.03\textwidth}
+\vspace{0.5em}\\
+$\mathbf{d=[1 0 0]}$\\\vspace{3em}
+$\mathbf{d=[0 1 0]}$\\\vspace{3em}
+$\mathbf{d=[0 0 1]}$
+\end{column}
+\begin{column}{0.98\textwidth}
+$\mathbf{\qquad\quad~~z_1\qquad\quad~z_2\qquad\quad~ z_3\qquad\quad~z_4\qquad\quad~z_5\qquad\quad~z_6}$
+\vspace{-1em}
 \begin{figure}
 \centering
 \only<1>{\includegraphics[width=0.9\textwidth,center]{joint_gif/jointvae-0.png}}%
@@ -466,13 +604,27 @@ CascadeVAE &6&\textbf{78.84 (15.65)}& \textbf{99.66}\\
 \only<9>{\includegraphics[width=0.9\textwidth,center]{joint_gif/jointvae-40.png}}%
 \only<10>{\includegraphics[width=0.9\textwidth,center]{joint_gif/jointvae-45.png}}
 \end{figure}
-\end{itemize}
+
+\end{column}
+\end{columns}
+
 \end{frame}
 
 \begin{frame}
 \frametitle{DSprites gif animation}
 \begin{itemize}\itemsep=8pt
-\item CascadeVAE
+\item CascadeVAE\\
+\end{itemize}
+\begin{columns}
+\begin{column}{0.03\textwidth}
+\vspace{0.5em}\\
+$\mathbf{d=[1 0 0]}$\\\vspace{3em}
+$\mathbf{d=[0 1 0]}$\\\vspace{3em}
+$\mathbf{d=[0 0 1]}$
+\end{column}
+\begin{column}{0.98\textwidth}
+$\mathbf{\qquad\quad~~z_1\qquad\quad~z_2\qquad\quad~ z_3\qquad\quad~z_4\qquad\quad~z_5\qquad\quad~z_6}$
+\vspace{-1em}
 \begin{figure}
 \centering
 \only<1>{\includegraphics[width=0.9\textwidth,center]{cascade_gif/cascade-0.png}}%
@@ -486,7 +638,8 @@ CascadeVAE &6&\textbf{78.84 (15.65)}& \textbf{99.66}\\
 \only<9>{\includegraphics[width=0.9\textwidth,center]{cascade_gif/cascade-40.png}}%
 \only<10>{\includegraphics[width=0.9\textwidth,center]{cascade_gif/cascade-45.png}}
 \end{figure}
-\end{itemize}
+\end{column}
+\end{columns}
 \end{frame}
 
 
@@ -569,21 +722,24 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 \end{figure}
 \end{frame}
 
+\begin{frame}
+\frametitle{Conclusion}
+\begin{itemize}\itemsep=12pt
+\item We first propose an efficient procedure for implicitly penalizing the total correlation by controlling the information flow on each variables without using extra discriminator networks or sampling procedures.
+\item We show a method for jointly learning discrete and continuous latent variables in an alternating maximization framework where we alternate between {\color{blue}{finding the most likely discrete configurations based on the continuous latent variables}}, and {\color{blue}{updating the inference parameters based on the discrete variables}}. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conclusion}
+\begin{itemize}
+\item Our ablation study shows that information cascading and alternating maximization of discrete and continuous variables, provide complementary benefits and leads to the state of the art performance in 1) disentanglement score, and 2) classification accuracy score from the discrete inference network, compared to a number of recently proposed methods.
+\end{itemize}
+\end{frame}
+
+
 \end{document}
 
 
-%%\begin{frame}
-%%\frametitle{Propositions}
-%%\begin{prop}
-%%\label{prop1}
-%%The mutual information between a single random variable and the rest can be factorized as
-%%\[I(z_{1:i-1}; z_i) = TC(z_{1:i}) - TC(z_{1:i-1})\]
-%%\end{prop}
-%%\begin{prop}
-%%\label{prop2}
-%%The mutual information between $x$ and partitions of $z = [z_1, z_2]$ can be factorized as,
-%%\[I(x; [z_1, z_2]) = I(x;z_1) + I(x; z_2) - I(z_1; z_2)\]
-%%\end{prop}
-%%\end{frame}
 
 
