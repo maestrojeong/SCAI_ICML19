@@ -119,7 +119,13 @@
 
 \begin{frame}
 \frametitle{Motivation}
+\begin{itemize}\itemsep=20pt
+\item Our interest is to {\color{blue}{disentangle}} the underlying explanatory factors of data {\color{blue}{without any supervision.}}
+\end{itemize}
+\end{frame}
 
+\begin{frame}
+\frametitle{Motivation}
 \begin{figure}
 \centering
 \only<1>{\includegraphics[page=1, width=\linewidth]{motivation}}%
@@ -135,11 +141,33 @@
 \begin{frame}
 \frametitle{Motivation}
 \begin{itemize}\itemsep=20pt
-\item Our interest is to {\color{blue}{disentangle}} the underlying explanatory factors of data {\color{blue}{without any supervision.}}\pause
-\item We require a stable disentanglement framework to capture {\color{blue}{continuous}} and {\color{blue}{discrete}} factors.
+\item Most recent methods focus on learning only the {\color{blue}{continuous}} factors of variation. \pause
+\item When modeling complex and high-dimensional data such as raw images, it becomes difficult to disentangle the {\color{blue}{discrete}} factors of data (\ie~ number of light sources, categorical shape of present objects) from {\color{blue}{continuous}} factors (\ie~ translation, rotation, color).\pause
+\item We require a stable disentanglement framework to capture {\color{blue}{continuous}} and {\color{blue}{discrete}} factors at the same time.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Motivation}
+\begin{figure}
+\centering
+\includegraphics[page=1, width=\linewidth]{discrete}%
+\end{figure}
+\begin{itemize}
+    \item If we use a step function at the end of encoder for discrete representation, {\color{red}{back-propagation cannot provide the training signal}}, because the derivative of a step function is 0 almost everywhere. This property becomes problematic when training discrete representations. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Motivation}
+\begin{itemize}\itemsep=20pt
+\item {\color{blue}{Learning discrete representations}} is known as a challenging problem. However, {\color{blue}{learning continuous and discrete representations}} is a more challening problem.
 %%\pause\item {\color{blue}{VAE}} framework guarantees a stable framework compared to GAN framework.
 \end{itemize}
 \end{frame}
+
+
 
 \begin{frame}
 \frametitle{Contributions}
@@ -250,10 +278,10 @@ TC(z)&=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrac
 \item By proposition2,
 \begin{align}
 &I(x;z_{1:i}) = I(x;z_{1:i-1}) + I(x;z_{i}) - I(z_{1:i-1};z_{i}).\nonumber\\
-&~~~~\onslide<2->{\uparrow} \only<1>{\qquad\qquad\quad\uparrow} \onslide<2->{\qquad\qquad\quad\bullet\quad\qquad\qquad\uparrow\qquad\qquad\quad\downarrow}\nonumber
+&~~~~\only<2,3>{\uparrow} \only<1>{\qquad\qquad\quad\uparrow} \only<2,3>{\qquad\qquad\quad\bullet\quad\qquad\qquad\uparrow\qquad\qquad\quad\downarrow}\nonumber
 \end{align}
-\item This factorization motivates a maximization algorithm sequentially updating the left hand side $I(x; z_{1:i})$ for all $i=2,\ldots,m$ which in turn minimizes each summand, $\mathbf{I(z_{i-1};z_i)}$.
-\onslide<3->{\item Sequentially, we maximize $I(x;z_{1:i})$ by penalizing $z_{i+1:m}$ with high $\beta$($\beta_h$) and the others with small $\beta$($\beta_l$).}
+\item This factorization motivates a maximization algorithm sequentially updating the left hand side $I(x; z_{1:i})$ for all $i=2,\ldots,m$ which in turn minimizes each summand, $\mathbf{I(z_{1:i-1};z_i)}$.
+\onslide<3->{\item Sequentially, we maximize $I(x;z_{1:i})$ by penalizing $z_{i+1:m}$ with high $\beta$ ($:=\beta_h$) and the others with small $\beta$ ($:=\beta_l$).}
 \end{itemize}
 \end{frame}
 
@@ -380,6 +408,13 @@ where $u_\theta^{(i)}$ denotes the vector of the  likelihood $\log p_\theta(x^{(
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Our method}
+\begin{figure}
+\includegraphics[page=2, width=\linewidth]{arch}
+\caption{Architecture of CascadeVAE}
+\end{figure}
+\end{frame} 
 
 \section{Experiments}
 \begin{frame}
@@ -424,7 +459,7 @@ where $u_\theta^{(i)}$ denotes the vector of the  likelihood $\log p_\theta(x^{(
 \item This dataset is used to assess the disentanglement properties of unsupervised learning methods.\pause
 \item There are 6 ground truth independent latent factors\\
     (e.g. color, shape, scale, orientation, position x, position y).\pause
-\item There are $737280(=1\times3\times6\times40\times32\times32)$ images.
+\item There are $737280$ $(=1\times3\times6\times40\times32\times32)$ images.
 \end{itemize}
 \end{frame}
 
@@ -438,7 +473,7 @@ where $u_\theta^{(i)}$ denotes the vector of the  likelihood $\log p_\theta(x^{(
 \end{column}
 \begin{column}{0.65\textwidth}
 \begin{itemize}\itemsep=26pt
-\item Shape: square, ellipse, heart{\color{red}{(discrete)}}
+\item Shape {\color{red}{(discrete)}} : square, ellipse, heart
 \item Scale: 6 values linearly spaced in $[0.5, 1]$
 \item Orientation: 40 values in $[0, 2\pi]$
 \item Position X: 32 values in $[0, 1]$
@@ -515,7 +550,7 @@ CascadeVAE &6&\textbf{78.84 (15.65)}& \textbf{99.66}\\
 \begin{column}{0.4\textwidth}
 \begin{itemize}\itemsep=12pt
 \item {\color{blue}{Unsupervised classification accuracy}} when size of discrete variable is 3.
-\item Unsupervised classification accuray for random chance is $33.33$.
+\item Random chance : $33.33$.
 \end{itemize}
 
 \end{column}
@@ -582,14 +617,14 @@ $\mathbf{\qquad\quad z_1\qquad\qquad~z_2\qquad\qquad~z_3\qquad\qquad~z_4\qquad\q
 \item JointVAE\\
 \end{itemize}
 \begin{columns}
-\begin{column}{0.03\textwidth}
+\begin{column}{0.07\textwidth}
 \vspace{0.5em}\\
-$\mathbf{d=[1 0 0]}$\\\vspace{3em}
-$\mathbf{d=[0 1 0]}$\\\vspace{3em}
-$\mathbf{d=[0 0 1]}$
+$\mathbf{d=[1, 0,  0]}$\\\vspace{3em}
+$\mathbf{d=[0, 1, 0]}$\\\vspace{3em}
+$\mathbf{d=[0, 0, 1]}$
 \end{column}
-\begin{column}{0.98\textwidth}
-$\mathbf{\qquad\quad~~z_1\qquad\quad~z_2\qquad\quad~ z_3\qquad\quad~z_4\qquad\quad~z_5\qquad\quad~z_6}$
+\begin{column}{0.93\textwidth}
+$\mathbf{\qquad\quad~z_1\qquad~~~z_2\qquad\quad~ z_3\qquad\quad\,z_4\qquad\quad\, z_5\qquad\quad\, z_6}$
 \vspace{-1em}
 \begin{figure}
 \centering
@@ -616,14 +651,14 @@ $\mathbf{\qquad\quad~~z_1\qquad\quad~z_2\qquad\quad~ z_3\qquad\quad~z_4\qquad\qu
 \item CascadeVAE\\
 \end{itemize}
 \begin{columns}
-\begin{column}{0.03\textwidth}
+\begin{column}{0.07\textwidth}
 \vspace{0.5em}\\
-$\mathbf{d=[1 0 0]}$\\\vspace{3em}
-$\mathbf{d=[0 1 0]}$\\\vspace{3em}
-$\mathbf{d=[0 0 1]}$
+$\mathbf{d=[1, 0,  0]}$\\\vspace{3em}
+$\mathbf{d=[0, 1, 0]}$\\\vspace{3em}
+$\mathbf{d=[0, 0, 1]}$
 \end{column}
-\begin{column}{0.98\textwidth}
-$\mathbf{\qquad\quad~~z_1\qquad\quad~z_2\qquad\quad~ z_3\qquad\quad~z_4\qquad\quad~z_5\qquad\quad~z_6}$
+\begin{column}{0.93\textwidth}
+$\mathbf{\qquad\quad~z_1\qquad~~~z_2\qquad\quad~ z_3\qquad\quad\,z_4\qquad\quad\, z_5\qquad\quad\, z_6}$
 \vspace{-1em}
 \begin{figure}
 \centering
@@ -667,7 +702,7 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 \begin{column}{0.4\textwidth}
 \begin{itemize}\itemsep=12pt
 \item {\color{blue}{Unsupervised classification accuracy}} when size of discrete variable is 10.
-\item Unsupervised classification accuray for random chance is $10.00$.
+\item Random chance : $10.00$.
 \end{itemize}
 
 \end{column}
@@ -725,7 +760,7 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}\itemsep=12pt
-\item We first propose an efficient procedure for implicitly penalizing the total correlation by controlling the information flow on each variables without using extra discriminator networks or sampling procedures.
+        \item We first propose an {\color{blue}{efficient procedure for implicitly penalizing the total correlation}} by {\color{red}{controlling the information flow on each variables}} without using extra discriminator networks or sampling procedures.
 \item We show a method for jointly learning discrete and continuous latent variables in an alternating maximization framework where we alternate between {\color{blue}{finding the most likely discrete configurations based on the continuous latent variables}}, and {\color{blue}{updating the inference parameters based on the discrete variables}}. 
 \end{itemize}
 \end{frame}
@@ -733,7 +768,7 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 \begin{frame}
 \frametitle{Conclusion}
 \begin{itemize}
-\item Our ablation study shows that information cascading and alternating maximization of discrete and continuous variables, provide complementary benefits and leads to the state of the art performance in 1) disentanglement score, and 2) classification accuracy score from the discrete inference network, compared to a number of recently proposed methods.
+    \item Our ablation study shows that {\color{blue}{information cascading}} and {\color{blue}{alternating maximization of discrete and continuous variables}}, provide complementary benefits and leads to the state of the art performance in 1) \textbf{disentanglement score}, and 2) \textbf{classification accuracy score} from the discrete inference network, compared to a number of recently proposed methods.
 \end{itemize}
 \end{frame}
 
