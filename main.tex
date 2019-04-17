@@ -118,7 +118,7 @@
 \end{column}
 \begin{column}{0.5\textwidth}
 \begin{itemize}\itemsep=12pt
-\item Wikipedia says "Extrication from twists, tangles, complications".
+\item Wikipedia says ``Extrication from twists, tangles, complications".
 \end{itemize}
 \end{column}
 \end{columns}
@@ -127,26 +127,26 @@
 
 \begin{frame}
 \frametitle{Motivation}
-\begin{itemize}\itemsep=12pt
-\item Our interest is to disentangle the underlying explanatory factors of data without any supervision.\pause
-\item We require a stable disentanglement framework to capture continuous and discrete factors.\pause
-\item VAE framework guarantees stable framework compared to GAN framework.
+\begin{itemize}\itemsep=20pt
+\item Our interest is to {\color{blue}{disentangle}} the underlying explanatory factors of data {\color{blue}{without any supervision.}}\pause
+\item We require a stable disentanglement framework to capture {\color{blue}{continuous}} and {\color{blue}{discrete}} factors.\pause
+\item {\color{blue}{VAE}} framework guarantees a stable framework compared to GAN framework.
 \end{itemize}
 \end{frame}
 
 
 \begin{frame}
 \frametitle{Contributions}
-\begin{itemize}\itemsep=12pt
-\item We propose a simple procedure for penalizing the total correlation without any extra discriminator network \footnote{{\color{blue}{Kim, H. and Mnih, A.}} Disentangling by factorising. {\color{gray}{ICML2018}}} or importance sampling \footnote{{\color{blue}{Chen, T. Q., Li, X., Grosse, R. B., and Duvenaud, D. K.}} Isolating sources of disentanglement in variational autoencoders. {\color{gray}{NIPS2018}}} in the $\beta$-VAE \footnote{{\color{blue}{Higgins, I., Matthey, L., Pal, A., Burgess, C., Glorot, X., Botvinick, M., Mohamed, S., and Lerchner, A.}} beta-vae: Learning basic visual concepts with a constrained variational framework. {\color{gray}{ICLR2017}}} framework.\pause
-\item We propose an alternating disentanglement method to disentangle discrete and continuous factors without lumping both the continuous and discrete factors into a single latent vector.
+\begin{itemize}\itemsep=20pt
+\item We propose a simple procedure for penalizing the {\color{blue}{total correlation}} without any extra {\color{blue}{discriminator network}}\footnote{{\color{blue}{Kim, H. and Mnih, A.}} Disentangling by factorising. {\color{gray}{ICML2018}}} or {\color{blue}{importance sampling}} \footnote{{\color{blue}{Chen, T. Q., Li, X., Grosse, R. B., and Duvenaud, D. K.}} Isolating sources of disentanglement in variational autoencoders. {\color{gray}{NIPS2018}}} in the {\color{blue}{$\beta$-VAE}} \footnote{{\color{blue}{Higgins, I., Matthey, L., Pal, A., Burgess, C., Glorot, X., Botvinick, M., Mohamed, S., and Lerchner, A.}} beta-vae: Learning basic visual concepts with a constrained variational framework. {\color{gray}{ICLR2017}}} framework.\pause
+\item We propose an {\color{blue}{alternating disentanglement method}} to disentangle discrete and continuous factors without lumping both the continuous and discrete factors into a single latent vector.
 \end{itemize}
 \end{frame}
 
 \section{Method}
 \begin{frame}
 \frametitle{$\beta$-VAE framework}
-\begin{itemize}\itemsep=12pt
+\begin{itemize}\itemsep=20pt
 \item VAE is a latent variable model that pairs a top-down decoding generator ($\theta$) and a bottom-up encoding inference network ($\phi$).\pause
 %%\item A variational lower bound of the marginal log-likelihood, $\mathbb{E}_{x \sim p(x)} \log p(x)$, is maximized.\pause
 \item VAE objective or the variational lower bound is,
@@ -175,10 +175,10 @@ where $q(z)$\footnote{$q(z) = \mathbb{E}_{x\sim p(x)} q(z\mid x)$} denotes the m
 
 \begin{frame}
 \frametitle{Total Correlation $TC(z)$}
-\begin{itemize}\itemsep=12pt
+\begin{itemize}\itemsep=20pt
 \item Total correlation or $TC(z)$ is a popular measure quantifying the redundancy among a set of $m$ random variables. \pause
 \item Multivariate version of mutual information $I(\cdot, \cdot)$\footnote{$I(z_1,z_2)= D_\text{KL}(q(z_1,z_2) \parallel q(z_1)q(z_2))=TC(z_{1,2})$}. \pause
-\item Penalizing TC leads the model to learn statistically independent factors in the data which is a crucial component in disentangled representations. 
+\item {\color{blue}{Penalizing TC}} leads the model to learn {\color{blue}{statistically independent factors}} in the data which is a crucial component in disentangled representations. 
 %%\begin{align}
 %%TC(z) = D_\text{KL}(q(z) \parallel \prod_j q(z_j)),\nonumber
 %%\end{align}
@@ -187,7 +187,7 @@ where $q(z)$\footnote{$q(z) = \mathbb{E}_{x\sim p(x)} q(z\mid x)$} denotes the m
 
 \begin{frame}
 \frametitle{Limitation of $\beta$-VAE}
-\begin{itemize}\itemsep=12pt
+\begin{itemize}\itemsep=20pt
 \item $\beta$-VAE objective is
 \begin{align}
 \mathbb{E}_{x \sim p(x)} \big[\mathbb{E}_{z \sim q_\phi(z \mid x)} \log p_\theta(x \mid z)- \beta D_\text{KL}\left(q_\phi(z \mid x) \parallel p(z)\right)\big].\nonumber
@@ -205,19 +205,19 @@ where $q(z)$\footnote{$q(z) = \mathbb{E}_{x\sim p(x)} q(z\mid x)$} denotes the m
 \begin{frame}
 \frametitle{Our method}
 \begin{itemize}\itemsep=12pt
-\item \[TC(z) = \sum_{i=2}^m I(z_{1:i-1}; z_i)\]
-\footnote{
+        \item \[TC(z) = \sum_{i=2}^m I(z_{1:i-1}; z_i) ~~~~\footnote{
 \begin{align}
 TC(z)=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace{TC(z_{1:i}) - TC(z_{1:i-1})}_{= I(z_{1:i-1}; z_i)} \right)\nonumber
-\end{align} 
-}\pause
+\end{align} \nonumber
+            }\]
+\pause
 \item We aim at penalizing $TC(z)$ by sequentially penalizing the individual summand $I(z_{1:i-1};z_i)$.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Our method}
-\begin{itemize}\itemsep=12pt
+\begin{itemize}\itemsep=20pt
 \item 
 \[I(x;z_{1:i}) = I(x;z_{1:i-1}) + I(x;z_{i}) - I(z_{1:i-1};z_{i})\]
 \item This factorization motivates a maximization algorithm sequentially updating the left hand side $I(x; z_{1:i})$ for all $i=2,\ldots,m$ which in turn minimizes each summand, $I(z_{i-1};z_i)$.\pause
@@ -235,7 +235,8 @@ TC(z)=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace
 \only<5>{\includegraphics[page=5, width=\linewidth]{arch}}
 \end{figure}
 \begin{itemize}
-\item In practice, each latent dimensions are heavily penalized with high $\beta$ in the beginning but are sequentially relieved one at a time with small $\beta$ in a cascading fashion. 
+\only<1>{\item Every latent dimensions are heavily penalized with $\beta_h$.}
+\onslide<2->{\item Each penalty on latent dimension is sequentially relieved one at a time with $\beta_l$ in a cascading fashion.}
 \end{itemize}
 \end{frame} 
 
@@ -296,7 +297,7 @@ TC(z)=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrace
 
 \begin{frame}
 \frametitle{dSprites Dataset}
-\begin{itemize}\itemsep=12pt
+\begin{itemize}\itemsep=20pt
 \item This dataset is used to assess the disentanglement properties of unsupervised learning methods.\pause
 \item There are 6 ground truth independent latent factors\\
     (e.g. color, shape, scale, orientation, position x, position y).\pause
@@ -359,7 +360,7 @@ CascadeVAE\\($\beta_l=1.0$)& 6 &90.49 (5.28)&\textbf{99.50}\\
 \end{column}
 \begin{column}{0.4\textwidth}
 \begin{itemize}\itemsep=12pt
-\item Disentanglement score is obtained from 10 different random seed each with the best hyperparameters. 
+\item {\color{blue}{Disentanglement score}} is obtained from 10 different random seed each with the best hyperparameters. 
 \item $m$ is the number of continous latent dimensions.
 \end{itemize}
 \end{column}
@@ -390,7 +391,7 @@ CascadeVAE &6&\textbf{78.84 (15.65)}& \textbf{99.66}\\
 \end{column}
 \begin{column}{0.4\textwidth}
 \begin{itemize}\itemsep=12pt
-\item Unsupervised classification results when size of discrete variable is 3.
+\item {\color{blue}{Unsupervised classification}} results when size of discrete variable is 3.
 \item Unsupervised classification accuray for random chance is $33.33$.
 \end{itemize}
 
@@ -512,7 +513,7 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 \end{column}
 \begin{column}{0.4\textwidth}
 \begin{itemize}\itemsep=12pt
-\item Unsupervised classification results  when size of discrete variable is 10.
+\item {\color{blue}{Unsupervised classification}} results  when size of discrete variable is 10.
 \item Unsupervised classification accuray for random chance is $10.00$.
 \end{itemize}
 
