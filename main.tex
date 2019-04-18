@@ -113,7 +113,7 @@
 \frametitle{Disentanglement}
 \begin{figure}
 \centering
-\includegraphics[width=0.6\linewidth]{disentanglement}
+\includegraphics[width=0.6\linewidth]{dis_asset/disentanglement}
 \end{figure}
 \end{frame}
 
@@ -128,13 +128,13 @@
 \frametitle{Motivation}
 \begin{figure}
 \centering
-\only<1>{\includegraphics[page=1, width=\linewidth]{motivation}}%
-\only<2>{\includegraphics[page=2, width=\linewidth]{motivation}}%
-\only<3>{\includegraphics[page=3, width=\linewidth]{motivation}}%
-\only<4>{\includegraphics[page=4, width=\linewidth]{motivation}}%
-\only<5>{\includegraphics[page=5, width=\linewidth]{motivation}}%
-\only<6>{\includegraphics[page=6, width=\linewidth]{motivation}}%
-\only<7>{\includegraphics[page=7, width=\linewidth]{motivation}}%
+\only<1>{\includegraphics[page=1, width=\linewidth]{dis_asset/motivation}}%
+\only<2>{\includegraphics[page=2, width=\linewidth]{dis_asset/motivation}}%
+\only<3>{\includegraphics[page=3, width=\linewidth]{dis_asset/motivation}}%
+\only<4>{\includegraphics[page=4, width=\linewidth]{dis_asset/motivation}}%
+\only<5>{\includegraphics[page=5, width=\linewidth]{dis_asset/motivation}}%
+\only<6>{\includegraphics[page=6, width=\linewidth]{dis_asset/motivation}}%
+\only<7>{\includegraphics[page=7, width=\linewidth]{dis_asset/motivation}}%
 \end{figure}
 \end{frame}
 
@@ -152,7 +152,7 @@
 \frametitle{Motivation}
 \begin{figure}
 \centering
-\includegraphics[page=1, width=\linewidth]{discrete}%
+\includegraphics[page=1, width=\linewidth]{dis_asset/discrete}%
 \end{figure}
 \begin{itemize}
     \item If we use a step function at the end of encoder for discrete representation, {\color{red}{back-propagation cannot provide the training signal}}, because the derivative of a step function is 0 almost everywhere. This property becomes problematic when training discrete representations. 
@@ -243,7 +243,7 @@ I(z_1,z_2)= D_\text{KL}(q(z_1,z_2) \parallel q(z_1)q(z_2))=TC(z_{1:2})\nonumber
 \begin{frame}
 \frametitle{Overview of our method}
 \begin{figure}
-\includegraphics[page=2, width=\linewidth]{arch}
+\includegraphics[page=2, width=\linewidth]{dis_asset/arch}
 \end{figure}
 \end{frame} 
 
@@ -288,10 +288,10 @@ TC(z)&=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrac
 \begin{frame}
 \frametitle{Our method}
 \begin{figure}
-\only<1>{\includegraphics[page=1, width=\linewidth]{arch}}%
-\only<2>{\includegraphics[page=2, width=\linewidth]{arch}}%
-\only<3>{\includegraphics[page=3, width=\linewidth]{arch}}%
-\only<4>{\includegraphics[page=4, width=\linewidth]{arch}}%
+\only<1>{\includegraphics[page=1, width=\linewidth]{dis_asset/arch}}%
+\only<2>{\includegraphics[page=2, width=\linewidth]{dis_asset/arch}}%
+\only<3>{\includegraphics[page=3, width=\linewidth]{dis_asset/arch}}%
+\only<4>{\includegraphics[page=4, width=\linewidth]{dis_asset/arch}}%
 \end{figure}
 \begin{itemize}
 \item Every latent dimensions are heavily penalized with $\beta_h$. Each penalty on latent dimension is sequentially relieved one at a time with $\beta_l$ in a cascading fashion.
@@ -302,8 +302,8 @@ TC(z)&=\underbrace{TC(z_{1:2})}_{= I(z_1; z_2)} + \sum_{i=3}^m \left( \underbrac
 \frametitle{Graphical model}
 \begin{figure}[bp]
 \centering
-\includegraphics[width=1.0\linewidth]{graphical_model.png}
-    \caption{Graphical models view of $\beta$-VAE, JointVAE, AAE with supervised discrete variables(AAE-S), and our method. Solid lines denote the generative process and the dashed lines denote the inference process. $x,z,d$ denotes the data, continuous latent code, and the discrete latent code respectively.}
+\includegraphics[width=1.0\linewidth]{dis_asset/graphical_model.png}
+\caption{Graphical models view of $\beta$-VAE, JointVAE, AAE with supervised discrete variables(AAE-S), and our method. Solid lines denote the generative process and the dashed lines denote the inference process. $x,z,d$ denotes the data, continuous latent code, and the discrete latent code respectively.}
 \end{figure}
 \end{frame} 
 
@@ -411,7 +411,7 @@ where $u_\theta^{(i)}$ denotes the vector of the  likelihood $\log p_\theta(x^{(
 \begin{frame}
 \frametitle{Our method}
 \begin{figure}
-\includegraphics[page=2, width=\linewidth]{arch}
+\includegraphics[page=2, width=\linewidth]{dis_asset/arch}
 \caption{Architecture of CascadeVAE}
 \end{figure}
 \end{frame} 
@@ -468,7 +468,7 @@ where $u_\theta^{(i)}$ denotes the vector of the  likelihood $\log p_\theta(x^{(
 \begin{columns}
 \begin{column}{0.35\textwidth}
 \begin{figure}
-\includegraphics[width=\linewidth]{dsprites}
+\includegraphics[width=\linewidth]{dis_asset/dsprites}
 \end{figure}
 \end{column}
 \begin{column}{0.65\textwidth}
@@ -716,22 +716,22 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 \centering
 \begin{subfigure}[t]{0.48\linewidth}
 \centering
-\includegraphics[width=0.8\linewidth]{mnist_slant.png}
+\includegraphics[width=0.8\linewidth]{dis_asset/mnist_slant.png}
 \caption{Angle}
 \end{subfigure}\hspace{0.005\linewidth}
 \begin{subfigure}[t]{0.48\linewidth}
 \centering
-\includegraphics[width=0.8\linewidth]{mnist_width.png}
+\includegraphics[width=0.8\linewidth]{dis_asset/mnist_width.png}
 \caption{Width}
 \end{subfigure}\hspace{0.005\linewidth}
 \begin{subfigure}[t]{0.48\linewidth}
 \centering
-\includegraphics[width=0.8\linewidth]{mnist_style.png}
+\includegraphics[width=0.8\linewidth]{dis_asset/mnist_style.png}
 \caption{Stroke}
 \end{subfigure}\hspace{0.005\linewidth}
 \begin{subfigure}[t]{0.48\linewidth}
 \centering
-\includegraphics[width=0.8\linewidth]{mnist_thickness.png}
+\includegraphics[width=0.8\linewidth]{dis_asset/mnist_thickness.png}
 \caption{Thickness}
 \end{subfigure}
 \caption{ Latent traversals on MNIST. Images in a row has the same latent variables except the traversed variable.}
@@ -742,7 +742,7 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 \frametitle{Qualitative results on MNIST}
 \begin{figure}[bp]
 \centering
-\includegraphics[width=0.8\linewidth]{mnist_digit.png}
+\includegraphics[width=0.8\linewidth]{dis_asset/mnist_digit.png}
 \caption{MNIST discrete latent space traversal. Images in a row has the same latent variables except discrete variable.}
 \end{figure}
 \end{frame}
@@ -751,7 +751,7 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 \frametitle{Qualitative results on Chairs}
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{chairs}
+\includegraphics[width=\linewidth]{dis_asset/chairs}
 \caption{Latent space traversal on chairs dataset. The last row shows the latent traversal of the discrete factor of dimension 3 with the period of 3.}
 \label{fig:chairs_latent_traversal}
 \end{figure}
