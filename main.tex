@@ -1048,7 +1048,7 @@ CascadeVAE &6&\textbf{78.84 (15.65)}& \textbf{99.66}\\
 %%\end{frame}
 
 \begin{frame}
-\frametitle{DSprites gif animation}
+\frametitle{Latent dimension traversal in dSprites}
 \begin{itemize}\itemsep=8pt
 \item $\beta$-VAE\\
 $\mathbf{\qquad\quad z_1\qquad\qquad~z_2\qquad\qquad~z_3\qquad\qquad~z_4\qquad\qquad~~z_5}$
@@ -1085,7 +1085,7 @@ $\mathbf{\qquad\quad z_1\qquad\qquad~z_2\qquad\qquad~z_3\qquad\qquad~z_4\qquad\q
 \end{frame}
 
 \begin{frame}
-\frametitle{DSprites gif animation}
+\frametitle{Latent dimension traversal in dSprites}
 \begin{itemize}\itemsep=8pt
 \item JointVAE\\
 \end{itemize}
@@ -1119,7 +1119,7 @@ $\mathbf{\qquad\quad~z_1\qquad~~~z_2\qquad\quad~ z_3\qquad\quad\,z_4\qquad\quad\
 \end{frame}
 
 \begin{frame}
-\frametitle{DSprites gif animation}
+\frametitle{Latent dimension traversal in dSprites}
 \begin{itemize}\itemsep=8pt
 \item CascadeVAE\\
 \end{itemize}
@@ -1364,8 +1364,8 @@ Recent methods mostly aim at \textbf{estimating the true gradient signal} based 
 \begin{frame}
 \frametitle{Black-box attacks with gradient estimation}
 \begin{itemize}\itemsep=12pt
-    \item However, these black-box attacks are very susceptible to the choice of hyperparameters such as the learning rate, decay rates, and the update rule.\pause
-    \item If we can devise an algorithm which does not require estimating the gradient, it would be free of the update hyperparameters and thus be more applicable.
+        \item However, these black-box attacks are \textbf{very susceptible to the choice of hyperparameters} such as the learning rate, decay rates, and the update rule.\pause
+        \item If we can devise an algorithm which does not require estimating the gradient, it would be \textbf{free of the update hyperparameters} and thus be more applicable.
 \end{itemize}
 \end{frame}
 
@@ -1585,6 +1585,7 @@ A function $F:2^{\mathcal{V}} \rightarrow \reals$ is submodular if for every $\m
 
 \begin{frame}
 \frametitle{Black-box adversarial attack via local search optimization}
+\setcounter{thm}{0}
 \begin{thm}
 Let $\mathcal{C}$ be an optimal solution for a function $F$ and $\mathcal{S}$ be the solution obtained by the local search algorithm. Then,
 \begin{align*}
@@ -1625,7 +1626,7 @@ x_{adv} \triangleq x + \epsilon \sum_{i \in \mathcal{S}}e_i - \epsilon \sum_{i \
     \frametitle{Hierarchical approach for query efficiency}
     \begin{itemize}\itemsep=12pt
         \item Running the local search algorithm on the set of all pixels could be query inefficient.\pause
-        \item To address this problem, we take a hierarchical approach, performing the local search on a coarse grid and use the results in the subsequent round on finer grid.
+        \item To address this problem, we take a \textbf{hierarchical approach}, performing the local search on a coarse grid and use the results in the subsequent round on finer grid.
     \end{itemize}\pause
     \begin{figure}
         \centering
@@ -1638,7 +1639,7 @@ x_{adv} \triangleq x + \epsilon \sum_{i \in \mathcal{S}}e_i - \epsilon \sum_{i \
     \frametitle{Hierarchical approach for query efficiency}
     \begin{itemize}\itemsep=12pt
         \item Running the local search algorithm on the set of all pixels could be query inefficient.
-        \item To address this problem, we take a hierarchical approach, performing the local search on a coarse grid and use the results in the subsequent round on finer grid.
+        \item To address this problem, we take a \textbf{hierarchical approach}, performing the local search on a coarse grid and use the results in the subsequent round on finer grid.
     \end{itemize}
     \begin{figure}
         \centering
@@ -1651,7 +1652,7 @@ x_{adv} \triangleq x + \epsilon \sum_{i \in \mathcal{S}}e_i - \epsilon \sum_{i \
     \frametitle{Hierarchical approach for query efficiency}
     \begin{itemize}\itemsep=12pt
         \item Running the local search algorithm on the set of all pixels could be query inefficient.
-        \item To address this problem, we take a hierarchical approach, performing the local search on a coarse grid and use the results in the subsequent round on finer grid.
+        \item To address this problem, we take a \textbf{hierarchical approach}, performing the local search on a coarse grid and use the results in the subsequent round on finer grid.
     \end{itemize}
     \begin{figure}
         \centering
@@ -1664,7 +1665,7 @@ x_{adv} \triangleq x + \epsilon \sum_{i \in \mathcal{S}}e_i - \epsilon \sum_{i \
     \frametitle{Hierarchical approach for query efficiency}
     \begin{itemize}\itemsep=12pt
         \item Running the local search algorithm on the set of all pixels could be query inefficient.
-        \item To address this problem, we take a hierarchical approach, performing the local search on a coarse grid and use the results in the subsequent round on finer grid.
+        \item To address this problem, we take a \textbf{hierarchical approach}, performing the local search on a coarse grid and use the results in the subsequent round on finer grid.
     \end{itemize}
     \begin{figure}
         \centering
@@ -1677,7 +1678,7 @@ x_{adv} \triangleq x + \epsilon \sum_{i \in \mathcal{S}}e_i - \epsilon \sum_{i \
     \frametitle{Hierarchical approach for query efficiency}
     \begin{itemize}\itemsep=12pt
         \item Running the local search algorithm on the set of all pixels could be query inefficient.
-        \item To address this problem, we take a hierarchical approach, performing the local search on a coarse grid and use the results in the subsequent round on finer grid.
+        \item To address this problem, we take a \textbf{hierarchical approach}, performing the local search on a coarse grid and use the results in the subsequent round on finer grid.
     \end{itemize}
     \begin{figure}
         \centering
