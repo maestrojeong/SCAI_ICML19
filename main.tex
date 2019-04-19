@@ -356,9 +356,9 @@ Measure the novelty with prediction error under the linear dynamics model and us
 \begin{frame}
 \frametitle{Baselines}
   \begin{itemize} \itemsep=12pt
-    \item We compare EMI with five exploration baselines on top of TRPO\footnote{{\color{blue} J. Schulman, S. Levine, P. Abbeel, M. Jordan, and P. Moritz.} ``Trust region policy optimization''. \textcolor{gray}{ICML2015.}}.
-    \uncover<2->{\item EX2\footnote<2->{{\color{blue} J. Fu, J. Co-Reyes, and S. Levine.} ``Ex2: Exploration with exemplar models for deep reinforcement learning''. \textcolor{gray}{NIPS2017.}} trains an ensemble model to estimate state visitation densities, and leads the agent to rarely visited states.}
-    \uncover<3->{\item ICM\footnote<3->{{\color{blue} D. Pathak, P. Agrawal, A. Efros, and T. Darrell.} ``Curiosity-driven exploration by self-supervised prediction''. \textcolor{gray}{ICML2017.}} forms forward and inverse dynamics models and uses prediction errors as exploration signals.}
+    \item We compare EMI with five exploration baselines on top of TRPO\footnote{\scriptsize{\color{blue} J. Schulman, S. Levine, P. Abbeel, M. Jordan, and P. Moritz.} ``Trust region policy optimization''. \textcolor{gray}{ICML2015.}}.
+    \uncover<2->{\item EX2\footnote<2->{\scriptsize{\color{blue} J. Fu, J. Co-Reyes, and S. Levine.} ``Ex2: Exploration with exemplar models for deep reinforcement learning''. \textcolor{gray}{NIPS2017.}} trains an ensemble model to estimate state visitation densities, and leads the agent to rarely visited states.}
+    \uncover<3->{\item ICM\footnote<3->{\scriptsize{\color{blue} D. Pathak, P. Agrawal, A. Efros, and T. Darrell.} ``Curiosity-driven exploration by self-supervised prediction''. \textcolor{gray}{ICML2017.}} forms forward and inverse dynamics models and uses prediction errors as exploration signals.}
   \end{itemize}
 
 \end{frame}
@@ -369,9 +369,9 @@ Measure the novelty with prediction error under the linear dynamics model and us
 \frametitle{Baselines}
   \begin{itemize} \itemsep=12pt
     \item RND\footnote{{\color{blue} Y. Burda, H. Edwards, A. Storkey, and O. Klimov.} ``Exploration by random network distillation''. \textcolor{gray}{ICLR2019.}} trains a network to predict the output of a fixed randomly initialized network and employs the prediction errors for exploration.
-    \renewcommand*{\thefootnote}{\fnsymbol{footnote}}\footnotetext<2->{\label{noteFinalPerformanceOnly}For final performance comparison only.}\renewcommand*{\thefootnote}{\arabic{footnote}}
-    \uncover<2->{\item AE-SimHash\footnote<2->{{\color{blue} H. Tang, R. Houthooft, D. Foote, A. Stooke, X. Chen, Y. Duan,  J. Schulman, F. De Turck, and P. Abbeel.} ``\# Exploration: A study of count-based exploration for deep reinforcement learning''. \textcolor{gray}{NIPS2017.}}\textsuperscript{\ref{noteFinalPerformanceOnly}} computes hash codes for input states by training an autoencoder, and generates count-based exploration signals with the hash codes.}
-    \uncover<3->{\item VIME\footnote<3->{{\color{blue} R. Houthooft, X. Chen, Y. Duan, J. Schulman, F. De Turck, and P. Abbeel.} ``Vime: Variational information maximizing exploration''. \textcolor{gray}{NIPS2016.}}\textsuperscript{\ref{noteFinalPerformanceOnly}} approximates the environment dynamics and uses the information gain of the learned dynamics model as intrinsic rewards.}
+    \renewcommand*{\thefootnote}{\fnsymbol{footnote}}\footnotetext<2->{\scriptsize \label{noteFinalPerformanceOnly}For final performance comparison only.}\renewcommand*{\thefootnote}{\arabic{footnote}}
+    \uncover<2->{\item AE-SimHash\footnote<2->{\scriptsize{\color{blue} H. Tang, R. Houthooft, D. Foote, A. Stooke, X. Chen, Y. Duan,  J. Schulman, F. De Turck, and P. Abbeel.} ``\# Exploration: A study of count-based exploration for deep reinforcement learning''. \textcolor{gray}{NIPS2017.}}\textsuperscript{\ref{noteFinalPerformanceOnly}} computes hash codes for input states by training an autoencoder, and generates count-based exploration signals with the hash codes.}
+    \uncover<3->{\item VIME\footnote<3->{\scriptsize{\color{blue} R. Houthooft, X. Chen, Y. Duan, J. Schulman, F. De Turck, and P. Abbeel.} ``Vime: Variational information maximizing exploration''. \textcolor{gray}{NIPS2016.}}\textsuperscript{\ref{noteFinalPerformanceOnly}} approximates the environment dynamics and uses the information gain of the learned dynamics model as intrinsic rewards.}
   \end{itemize}
 \end{frame}
 
@@ -646,7 +646,7 @@ Montezuma & \textbf{387}& 0& 161& 377 & 75& -& 0\\
 \begin{frame}
 \frametitle{Contributions}
 \begin{itemize}\itemsep=20pt
-        \item We propose a simple procedure for penalizing the {\color{blue}{total correlation}} without any extra {\color{blue}{discriminator network(FactorVAE)}}\footnote{{\color{blue}{Kim, H. and Mnih, A.}} Disentangling by factorising. {\color{gray}{ICML2018}}} or {\color{blue}{importance sampling}} \footnote{{\color{blue}{Chen, T. Q., Li, X., Grosse, R. B., and Duvenaud, D. K.}} Isolating sources of disentanglement in variational autoencoders. {\color{gray}{NIPS2018}}} in the {\color{blue}{$\beta$-VAE}} \footnote{{\color{blue}{Higgins, I., Matthey, L., Pal, A., Burgess, C., Glorot, X., Botvinick, M., Mohamed, S., and Lerchner, A.}} beta-vae: Learning basic visual concepts with a constrained variational framework. {\color{gray}{ICLR2017}}} framework.\pause
+        \item We propose a simple procedure for penalizing the {\color{blue}{total correlation}} without any extra {\color{blue}{discriminator network(FactorVAE)}}\footnote{\scriptsize {\color{blue}{Kim, H. and Mnih, A.}} ``Disentangling by factorising'' {\color{gray}{ICML2018}}.} or {\color{blue}{importance sampling}} \footnote{\scriptsize{\color{blue}{Chen, T. Q., Li, X., Grosse, R. B., and Duvenaud, D. K.}} ``Isolating sources of disentanglement in variational autoencoders'' {\color{gray}{NIPS2018}}.} in the {\color{blue}{$\beta$-VAE}} \footnote{\scriptsize{\color{blue}{Higgins, I., Matthey, L., Pal, A., Burgess, C., Glorot, X., Botvinick, M., Mohamed, S., and Lerchner, A.}} ``beta-vae: Learning basic visual concepts with a constrained variational framework'' {\color{gray}{ICLR2017}}.} framework.\pause
 \item We propose an {\color{blue}{alternating disentanglement method}} to disentangle discrete and continuous factors without lumping both the continuous and discrete factors into a single latent vector.
 \end{itemize}
 \end{frame}
@@ -877,7 +877,7 @@ where $u_\theta^{(i)}$ denotes the vector of the  likelihood $\log p_\theta(x^{(
 \begin{frame}
 \frametitle{Alternating minimization scheme}
 \begin{itemize}
-    \item The inner maximization problem $\mathcal{L}_{LB}(\theta, \phi)$  over the discrete variables $[d^{(1)},\ldots,d^{(n)}]$ subject to the sparsity equality constraints can be exactly solved in polynomial time via \emph{minimum cost flow}(mcf) without  continuous relaxation \footnote{ {\color{blue}{Jeong, Y. and Song, H. O.}} Efficient end-to-end learning for quantizable representations. {\color{gray}{ICML2018}} }. 
+    \item The inner maximization problem $\mathcal{L}_{LB}(\theta, \phi)$  over the discrete variables $[d^{(1)},\ldots,d^{(n)}]$ subject to the sparsity equality constraints can be exactly solved in polynomial time via \emph{minimum cost flow}(mcf) without  continuous relaxation \footnote{\scriptsize {\color{blue}{Jeong, Y. and Song, H. O.}} ``Efficient end-to-end learning for quantizable representations'' {\color{gray}{ICML2018}}.}. 
 \end{itemize}
 \end{frame}
 
@@ -1337,8 +1337,8 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
     \[x^{t+1} = \Pi_{x+\epsilon}(x^t+\alpha \sign (\nabla_x \ell(\theta, x^t, y))\]
 \end{itemize}
 
-\footnote{\scriptsize Ian Goodfellow et al., \textit{Explaining and Harnessing Adversarial Examples, 2015}}
-\footnote{\scriptsize Madry et al., \textit{Towards deep learning models resistent to adversarial attack, 2017}}
+    \footnote{\scriptsize {\color{blue} Ian Goodfellow et al.} ``Explaining and Harnessing Adversarial Examples'' {\color{gray} 2015}.}
+    \footnote{\scriptsize {\color{blue} Madry et al.} ``Towards deep learning models resistent to adversarial attack'' {\color{gray} 2017}.}
 \end{frame}
 
 \begin{frame}
@@ -1355,9 +1355,9 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 Recent methods mostly aim at \textbf{estimating the true gradient signal} based on the input queries.\pause
 \vspace{1em}
 \begin{itemize}\itemsep=12pt
-    \item \textbf{ZOO}\footnote{\scriptsize Chen, et al., \textit{Zoo: Zeroth order optimization based black-box attacks to deep neural networks without training substitute models, 2017}} computes the coordinate-wise numerical gradients by querying for central difference values and apply coordinate descent method.
+\item \textbf{ZOO}\footnote{\scriptsize {\color{blue} Chen, et al.} ``Zoo: Zeroth order optimization based black-box attacks to deep neural networks without training substitute models'' {\color{gray} ACM2017}.} computes the coordinate-wise numerical gradients by querying for central difference values and apply coordinate descent method.
     \[\hat g_i \coloneqq \frac{\partial \ell(x)}{\partial x_i} \approx \frac{\ell (x+\sigma e_i) - \ell (x-\sigma e_i)}{2\sigma}\] \vspace{-1.5em} \pause
-    \item \textbf{NES}\footnote{\scriptsize Ilyas, et al., \textit{Black-box adversarial attacks with limited queries and information, 2018}} and \textbf{Bandits}\footnote{\scriptsize Ilyas, et al., \textit{Prior convictions: Black-box adversarial attacks with bandits and priors, 2018}} compute the vector-wise gradient estimate with random sampled vectors $\{u_i\}$ by $\frac{1}{\sigma n} \sum_{i}^{n}(\ell(x+\sigma u_i)-\ell(x-\sigma u_i))u_i$ and apply projected gradient descent.
+\item \textbf{NES}\footnote{\scriptsize {\color{blue} Ilyas, et al.} ``Black-box adversarial attacks with limited queries and information'' {\color{gray}ICML2018}} and \textbf{Bandits}\footnote{\scriptsize {\color{blue}Ilyas, et al.} ``Prior convictions: Black-box adversarial attacks with bandits and priors'' {\color{gray} 2018}} compute the vector-wise gradient estimate with random sampled vectors $\{u_i\}$ by $\frac{1}{\sigma n} \sum_{i}^{n}(\ell(x+\sigma u_i)-\ell(x-\sigma u_i))u_i$ and apply projected gradient descent.
 \end{itemize}
 \end{frame}
 
@@ -1510,7 +1510,7 @@ A function $F:2^{\mathcal{V}} \rightarrow \reals$ is submodular if for every $\m
 \begin{frame}
 \frametitle{Local search algorithm}
 \begin{itemize}\itemsep=10pt
-    \item For non-monotone set functions, \textbf{local search algorithm}\footnote{Feige, et al., \textit{Maximizing non-monotone submodular functions, 2011}} performs better than standard greedy insertion algorithms.\pause
+        \item For non-monotone set functions, \textbf{local search algorithm}\footnote{{\color{blue} Feige, et al.} ``Maximizing non-monotone submodular functions'' {\color{gray} SIAM2011}} performs better than standard greedy insertion algorithms.\pause
     \item The algorithm alternates between greedily inserting an element and removing an element while the marginal gain is strictly positive.\pause
 \end{itemize}
 \setcounter{algorithm}{0}
@@ -1597,7 +1597,7 @@ where
     \xi = \binom{|\mathcal{S} \setminus \mathcal{C}|}{2} + \binom{|\mathcal{C} \setminus \mathcal{S}|}{2} + |\overline{\mathcal{S} \cup \mathcal{C}}| \cdot |\mathcal{S}| + |\mathcal{C} \setminus \mathcal{S}| \cdot |\mathcal{S} \cap \mathcal{C}|
 \end{align*}
 \normalsize
-and $\lambda_{F}(\cdot,\cdot)$ is the submodularity index\footnote{\scriptsize Zhou and Spanos, \textit{Casual meets submodular: Subset selection with directed information, 2016}} of $F$, which is a measure of the degree of submodularity.
+    and $\lambda_{F}(\cdot,\cdot)$ is the submodularity index\footnote{\scriptsize {\color{blue} Zhou and Spanos}, ``Casual meets submodular: Subset selection with directed information'' {\color{gray} NIPS2016}} of $F$, which is a measure of the degree of submodularity.
 \end{thm}
 \end{frame}
 
