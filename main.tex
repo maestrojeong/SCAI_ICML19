@@ -47,7 +47,6 @@
 
 
 %
-\usepackage{enumitem}
 \usepackage{alphalph}
 \usepackage{array}
 \usepackage{graphics}
@@ -112,8 +111,474 @@
   \titlepage
 \end{frame}
 
+\section{EMI: Exploration with Mutual Information}
+%%\subsection{Background} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Reinforcement Learning}
+  \textbf{Reinforcement Learning} is learning by interacting with environments.
+
+  \begin{itemize} \itemsep=6pt
+      \item Learn from consequences of actions.
+      \item Receives reinforcement signal (reward).
+      \item Seeks to maximize accumulated reward.
+  \end{itemize}
+  \begin{figure}[h]
+        \centering
+          \includegraphics[width=0.7\textwidth]{emi_figures/mk_intro}
+  \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Reinforcement learning objective}
+
+	Let $\pi$ denote a stochastic policy $\pi : S \times A \rightarrow [0, 1]$, and let $\eta(\pi)$ denote its expected discounted reward:
+	\begin{align*}
+	&\eta(\pi) = \mathbb{E}_{s_0, a_0, \cdots} \left[ \sum_{t=0}^{\infty} \gamma^t r(s_t) \right], \text{where} \\
+	&\quad s_0 \sim \rho_0(s_0), a_t \sim \pi(a_t | s_t), s_{t+1} \sim P(s_{t+1} | s_t, a_t).
+	\end{align*}
+  \begin{figure}[h]
+        \centering
+          \includegraphics[width=0.7\textwidth]{emi_figures/pg_policy}
+          \caption{Example policy network of Atari 2600 Pong.}
+  \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Sparse reward environments}
+  \begin{itemize} \itemsep=6pt
+      \item It is hard to learn policy in sparse reward environments.
+      \item How can we explore sparse reward environments efficiently?
+  \end{itemize}
+
+  \begin{figure}[h]
+        \centering
+          \includegraphics[width=0.3\textwidth]{emi_figures/bc_montezuma}
+          \caption{Agent should move in $1 \rightarrow 2 \rightarrow 3 \rightarrow 4 \rightarrow 5 \rightarrow 6$ to get the reward signal.}
+  \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+%%\subsection{Methods} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Intuition}
+  \begin{itemize} \itemsep=6pt
+      \item Construct \textbf{the embedding representations} of the observation and action.
+      \item Measure \textbf{the novelty} of encountering states with embedding representations.
+  \end{itemize}
+  \pause
+
+  \begin{figure}[h]
+        \centering
+          \includegraphics[width=0.7\textwidth]{emi_figures/figure_embedding_concept}
+          \caption{Visualization of a sample trajectory in our learned embedding space.}
+  \end{figure}
+
+\end{frame}
+
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Learn embedding representations}
+
+Learn embedding of states $\phi_\alpha : \mathcal{S} \rightarrow \reals^d$ and actions $\psi_\beta: \mathcal{A} \rightarrow \reals^d$.
+\vspace{1em}
+
+\begin{enumerate} \itemsep=12pt
+\item Given $[\phi_\alpha(s); \psi_\beta(a)]$, the uncertainty of the embedding representation of the corresponding next states $\phi_\alpha(s')$ should be minimal and vice versa. \pause
+
+\item Given $[\phi_\alpha(s); \phi_\alpha(s')]$, the uncertainty of the embedding representation of the corresponding actions $\psi_\beta(a)$ should also be minimal and vice versa.
+
+\end{enumerate}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Learn embedding representations}
+
+Learn embedding of states $\phi_\alpha : \mathcal{S} \rightarrow \reals^d$ and actions $\psi_\beta: \mathcal{A} \rightarrow \reals^d$.
+
+\begin{align}
+\text{1. }\maximize_{\alpha, \beta}~ \mathcal{I}_S(\alpha, \beta) &:= \mathcal{I}([\phi_\alpha(s); \psi_\beta(a)]; \phi_\alpha(s')) \nonumber \\
+&= \mathcal{D}_{\text{KL}}\left(\mathbb{P}_{SAS'}^\pi \parallel \mathbb{P}_{SA}^\pi \otimes \mathbb{P}_{S'}^\pi\right) \nonumber
+%\label{eqn:infogain_s}
+\end{align}\pause
+\vspace{-1em}
+\begin{align}
+\text{2. }\maximize_{\alpha, \beta}~ \mathcal{I}_A(\alpha, \beta) &:= \mathcal{I}([\phi_\alpha(s); \phi_\alpha(s')]; \psi_\beta(a)) \nonumber \\
+&= \mathcal{D}_{\text{KL}}\left(\mathbb{P}_{SAS'}^\pi \parallel \mathbb{P}_{SS'}^\pi \otimes \mathbb{P}_A^\pi\right) \nonumber
+%\label{eqn:infogain_a}
+\end{align}
+
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+\begin{thm}\label{thm:emi_js}
+The lower bound of mutual information using Jensen-Shannon divergence:
+\begin{align*}
+    \mathcal{I}^{(\text{JSD})}(X; Z) &\geq \sup_{\omega \in \Omega} 
+    \mathbb{E}_{\mathbb{P}_{XZ}} \left[-\text{sp} \left(-T_{\omega}(x,z)\right)\right] \\
+    & - \mathbb{E}_{\mathbb{P}_{X} \otimes \mathbb{P}_Z} \left[ \text{sp} \left(T_{\omega}(x,z)\right)\right]+\log(4)
+\end{align*}
+\end{thm}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\begin{proof}
+\begin{align*}
+    &\mathcal{I}^{(\text{JSD})}(X; Z) = \mathcal{D}_\text{JSD}(\mathbb{P}_{XZ} \parallel \mathbb{P}_{X} \otimes \mathbb{P}_Z)\nonumber\\
+    &\geq \sup_{\omega \in \Omega} \mathbb{E}_{\mathbb{P}_{XZ}} \left[S_\omega(x,z)\right] - \mathbb{E}_{\mathbb{P}_{X} \otimes \mathbb{P}_Z} \left[\text{JSD}^{*}\left(S_\omega(x,z)\right)\right] \nonumber\\
+    &= \sup_{\omega \in \Omega} \mathbb{E}_{\mathbb{P}_{XZ}} \left[-\text{sp} \left(-T_{\omega}(x,z)\right)\right] \nonumber \\ 
+    & \qquad \quad - \mathbb{E}_{\mathbb{P}_{X} \otimes \mathbb{P}_Z} \left[ \text{sp} \left(T_{\omega}(x,z)\right)\right] +\log(4),
+\end{align*}
+where the inequality in the second line holds from the definition of $f$-divergence. In the third line, we substituted $S_\omega(x,z) = \log(2) - \log(1+\exp(-T_\omega(x,z)))$ and \textit{Fenchel conjugate} of Jensen-Shannon divergence, $\text{JSD}^{*}(t) = -\log(2-\exp(t))$.
+\end{proof}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Learn embedding representations}
+
+Learn embedding of states $\phi_\alpha : \mathcal{S} \rightarrow \reals^d$ and actions $\psi_\beta: \mathcal{A} \rightarrow \reals^d$.
+
+
+\begin{align} 
+%\label{eqn:infogain_s_jsd}
+\text{1. }\maximize_{\alpha, \beta}&~ \mathcal{I}^{\text{(JSD)}}_S(\alpha, \beta) \nonumber \\
+\geq& \maximize_{\alpha, \beta}  \sup_{\omega_S \in \Omega_S}\mathbb{E}_{\mathbb{P}_{SAS'}^\pi} \left[-\text{sp} \left(-T_{\omega_S}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(s'))\right)\right] \nonumber \\
+& -\mathbb{E}_{\mathbb{P}_{SA}^\pi \otimes \mathbb{P}_{S'}^\pi} \left[ \text{sp} \left(T_{\omega_S}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(\tilde{s'}))\right)\right] + \log{4} \nonumber
+\end{align}\pause
+\begin{align}
+%\label{eqn:infogain_a_jsd}
+\text{2. }\maximize_{\alpha, \beta}&~ \mathcal{I}^{\text{(JSD)}}_A(\alpha, \beta) \nonumber \\
+\geq& \maximize_{\alpha, \beta}  \sup_{\omega_A \in \Omega_A} \mathbb{E}_{\mathbb{P}_{SAS'}^\pi} \left[-\text{sp} \left(-T_{\omega_A}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(s'))\right)\right] \nonumber \\
+& -\mathbb{E}_{\mathbb{P}_{SS'}^\pi \otimes \mathbb{P}_{A}^\pi} \left[ \text{sp} \left(T_{\omega_A}(\phi_\alpha(s), \psi_\beta(\tilde{a}), \phi_\alpha(s'))\right)\right] +\log{4} \nonumber
+\end{align}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Architecture of EMI}
+  \vspace{2em}
+  \hspace*{-2em} \includegraphics[width=0.95\paperwidth]{emi_figures/arch_diagram}
+  \vspace{-1em}
+  \begin{figure}
+      \caption{Computational architecture for estimating $\mathcal{I}^{\text{(JSD)}}_S$ and $\mathcal{I}^{\text{(JSD)}}_A$ for image-based observations.}
+  \end{figure}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Linear dynamics model with error model}
+\begin{itemize} \itemsep=12pt
+\item Learn $\phi(s)$ and $\psi(a)$ such that $\phi(s')$ follow linear dynamics \ie~ $\phi(s') = \phi(s) + \psi(a)$.
+\item Offload irreducible error to the error model $S_\gamma : \mathcal{S} \times \mathcal{A} \rightarrow \reals^d$.
+\end{itemize}
+
+\begin{align}
+&\minimize_{\alpha, \beta, \gamma} \underbrace{\| S_\gamma \|_{2,0}}_{\text{error minimization}} \nonumber\\
+&\text{\ subject to }~~ \underbrace{\Phi_{\alpha}' = \Phi_\alpha + \Psi_\beta + S_\gamma}_{\text{embedding linear dynamics}}, \nonumber
+%\label{eqn:sparse}
+\end{align}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Learning objective}
+
+\begin{align} 
+\minimize_{\alpha, \beta, \gamma} ~ &\|\Phi'_\alpha - \left( \Phi_\alpha + \Psi_\beta  + S_\gamma \right)\|_F^2 \nonumber\\
+&+ \lambda_{\text{error}} \| S_\gamma \|_F^2
++ \lambda_\text{info} \mathcal{L}_\text{info}, \nonumber
+\end{align}
+%\vspace{-5em}
+\begin{align}
+\text{where, }\mathcal{L}_\text{info} &= \inf_{\omega_S \in \Omega_S} \mathbb{E}_{\mathbb{P}_{SAS'}^\pi} \text{sp} \left(-T_{\omega_S}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(s'))\right) \nonumber \\
+&\qquad \quad + \mathbb{E}_{\mathbb{P}_{SA}^\pi \otimes \mathbb{P}_{S'}^\pi} ~\text{sp} \left(T_{\omega_S}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(\tilde{s'}))\right) \nonumber \\
+&+ \inf_{\omega_A \in \Omega_A} \mathbb{E}_{\mathbb{P}_{SAS'}^\pi} \text{sp} \left(-T_{\omega_A}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(s'))\right) \nonumber \\
+&\qquad \quad + \mathbb{E}_{\mathbb{P}_{SS'}^\pi \otimes \mathbb{P}_{A}^\pi} ~\text{sp} \left(T_{\omega_A}(\phi_\alpha(s), \psi_\beta(\tilde{a}), \phi_\alpha(s'))\right) \nonumber
+\end{align}
+
+
+\end{frame}
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Intrinsic reward augmentation}
+Measure the novelty with prediction error under the linear dynamics model and use it as intrinsic reward.
+\begin{align}
+\hspace{-0.5em}  r_i(s_t, a_t, s_t') = \|\phi(s_t) + \psi(a_t) + S(s_t, a_t) - \phi(s_t')\|^2 \nonumber
+%\label{eqn:ir_err}
+\end{align}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Pseudocode}
+  \begin{figure}[h]
+        \centering
+          \includegraphics[width=0.7\textwidth]{emi_figures/emi_alg}
+  \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+%%\subsection{Experiments} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Baselines}
+  \begin{itemize} \itemsep=12pt
+    \item We compare EMI with five exploration baselines on top of TRPO\footnote{{\color{blue} J. Schulman, S. Levine, P. Abbeel, M. Jordan, and P. Moritz.} ``Trust region policy optimization''. \textcolor{gray}{ICML2015.}}.
+    \uncover<2->{\item EX2\footnote<2->{{\color{blue} J. Fu, J. Co-Reyes, and S. Levine.} ``Ex2: Exploration with exemplar models for deep reinforcement learning''. \textcolor{gray}{NIPS2017.}} trains an ensemble model to estimate state visitation densities, and leads the agent to rarely visited states.}
+    \uncover<3->{\item ICM\footnote<3->{{\color{blue} D. Pathak, P. Agrawal, A. Efros, and T. Darrell.} ``Curiosity-driven exploration by self-supervised prediction''. \textcolor{gray}{ICML2017.}} forms forward and inverse dynamics models and uses prediction errors as exploration signals.}
+  \end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Baselines}
+  \begin{itemize} \itemsep=12pt
+    \item RND\footnote{{\color{blue} Y. Burda, H. Edwards, A. Storkey, and O. Klimov.} ``Exploration by random network distillation''. \textcolor{gray}{ICLR2019.}} trains a network to predict the output of a fixed randomly initialized network and employs the prediction errors for exploration.
+    \renewcommand*{\thefootnote}{\fnsymbol{footnote}}\footnotetext<2->{\label{noteFinalPerformanceOnly}For final performance comparison only.}\renewcommand*{\thefootnote}{\arabic{footnote}}
+    \uncover<2->{\item AE-SimHash\footnote<2->{{\color{blue} H. Tang, R. Houthooft, D. Foote, A. Stooke, X. Chen, Y. Duan,  J. Schulman, F. De Turck, and P. Abbeel.} ``\# Exploration: A study of count-based exploration for deep reinforcement learning''. \textcolor{gray}{NIPS2017.}}\textsuperscript{\ref{noteFinalPerformanceOnly}} computes hash codes for input states by training an autoencoder, and generates count-based exploration signals with the hash codes.}
+    \uncover<3->{\item VIME\footnote<3->{{\color{blue} R. Houthooft, X. Chen, Y. Duan, J. Schulman, F. De Turck, and P. Abbeel.} ``Vime: Variational information maximizing exploration''. \textcolor{gray}{NIPS2016.}}\textsuperscript{\ref{noteFinalPerformanceOnly}} approximates the environment dynamics and uses the information gain of the learned dynamics model as intrinsic rewards.}
+  \end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+\frametitle{Environments}
+  \begin{itemize} \itemsep=6pt
+    \item Use sparse-reward environments to evaluate and compare the exploration capabilities of the baseline methods and EMI.
+    \item \textit{SwimmerGather} and \textit{SparseHalfCheetah} from MuJoCo for locomotion tasks with continuous control.
+    \item Six Atari environments, \textit{Freeway}, \textit{Frostbite}, \textit{Venture}, \textit{Montezuma's Revenge}, \textit{Gravitar}, and \textit{Solaris} from Arcade Learning Environment for vision-based tasks with discrete control.
+  \end{itemize}
+  \pause
+  \vspace{1em}
+  
+  \begin{figure}[h]
+    \centering
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[height=7em,right]{emi_figures/env_image_SwimmerGather.png}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[height=7em,center]{emi_figures/env_image_MontezumaRevenge.png}
+    \end{subfigure}
+    \begin{subfigure}[t]{0.3\textwidth}
+        \centering
+        \includegraphics[height=7em,left]{emi_figures/env_image_Venture.png}
+    \end{subfigure}
+    \caption{Example scenes from \textit{SwimmerGather} (left), \textit{Montezuma's Revenge} (middle), and \textit{Venture} (right).}
+  \end{figure}
+
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Comparison of average returns}
+  \begin{figure}[ht!]
+      \centering
+      \begin{subfigure}{0.32\textwidth}
+          \includegraphics[width=\textwidth]{emi_figures/SwimmerGather_all.pdf}
+          \caption{\textit{SwimmerGather}}
+      \end{subfigure}
+      \begin{subfigure}{0.32\textwidth}
+          \includegraphics[width=\textwidth]{emi_figures/SparseHalfCheetah_all.pdf}
+          \caption{\textit{SparseHalfCheetah}}
+      \end{subfigure}
+      \begin{subfigure}{0.32\textwidth}
+          \includegraphics[width=\textwidth]{emi_figures/SparseHalfCheetah_ablate_loss.pdf}
+   	      \caption{Ablation study}
+      \end{subfigure}
+      \caption{(a), (b): Performance of EMI on locomotion tasks with sparse rewards compared to baseline methods. The solid lines show the mean reward (y-axis) of 5 different seeds at each iteration (x-axis) and the shaded area represents one standard deviation from the mean. (c): Ablation result on \textit{SparseHalfCheetah}.}
+  \end{figure}
+\end{frame}
+
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Comparison of average returns}
+\begin{figure}[ht!]
+  \resizebox{0.8\columnwidth}{!}{
+    \centering
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{emi_figures/Freeway_all.pdf}
+        \caption{\textit{Freeway}}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{emi_figures/Frostbite_all.pdf}
+        \caption{\textit{Frostbite}}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{emi_figures/Venture_all.pdf}
+        \caption{\textit{Venture}}
+    \end{subfigure}
+  }
+    
+  \resizebox{0.8\columnwidth}{!}{
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{emi_figures/Gravitar_all.pdf}
+        \caption{\textit{Gravitar}}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{emi_figures/Solaris_all.pdf}
+        \caption{\textit{Solaris}}
+    \end{subfigure}
+    \begin{subfigure}{0.32\textwidth}
+        \includegraphics[width=\textwidth]{emi_figures/MontezumaRevenge_all.pdf}
+        \caption{\textit{Montezuma's Revenge}}
+    \end{subfigure}
+  }
+  \caption{Performance of EMI on sparse reward Atari environments compared to the baseline methods. The solid lines show the mean reward (y-axis) of 5 different seeds at each iteration (x-axis).}
+\end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Comparison of final performance}
+\begin{table}[ht!]
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{ |p{2.8cm}| >{\centering\arraybackslash}p{1.5cm} | >{\centering\arraybackslash}p{1.5cm}|  >{\centering\arraybackslash}p{1.5cm} | >{\centering\arraybackslash}p{1.5cm} | >{\centering\arraybackslash}p{2cm} | >{\centering\arraybackslash}p{1.5cm} | >{\centering\arraybackslash}p{1.5cm} |}
+\hline
+& EMI & EX2 & ICM  & RND & AE-SimHash & VIME & TRPO  \\
+\hline
+SwimmerGather& \textbf{0.438}& 0.200& 0 & 0 & 0.258& 0.196& 0\\
+SparseHalfCheetah& \textbf{218}& 153.7& 1.4& 3.36 & 0.5& 98.0& 0\\
+\hline
+Freeway & \textbf{33.8}& 27.1& 33.6& 33.3 & 33.5& -& 26.7\\
+
+Frostbite & \textbf{7002}& 3387& 4465& 2227 & 5214& -& 2034\\
+
+Venture & 646 & 589& 418& \textbf{707} & 445& -& 263\\
+
+Gravitar & \textbf{558}& 550& 424& 546 & 482& -& 508\\
+
+Solaris & 2688& 2276& 2453& 2051 & \textbf{4467}& -& 3101\\
+
+Montezuma & \textbf{387}& 0& 161& 377 & 75& -& 0\\
+\hline
+
+ \hline
+\end{tabular}
+}
+\caption{Mean reward comparison with baseline methods. We compare EMI with EX2, ICM, RND, AE-SimHash, VIME, and vanilla TRPO. The EMI, EX2, ICM, RND, and TRPO columns show the mean reward of 5 different seeds. The AE-SimHash and VIME columns show the results from the original papers. The results of MuJoCo experiments are reported at 5M and 100M time steps respectively. The results of Atari experiments are reported at 50M time steps.}
+\end{table}
+\end{frame}
+
+
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Learned EMI embeddings}
+  \begin{figure}[h]
+    \centering
+    \includegraphics<1>[width=\textwidth]{emi_figures/figure_paths_emb_sparsehalfcheetah_1.pdf}
+    \includegraphics<2>[width=\textwidth]{emi_figures/figure_paths_emb_sparsehalfcheetah_2.pdf}
+    \includegraphics<3>[width=\textwidth]{emi_figures/figure_paths_emb_sparsehalfcheetah_3.pdf}
+    \includegraphics<4>[width=\textwidth]{emi_figures/figure_paths_emb_sparsehalfcheetah_4.pdf}
+    \includegraphics<5>[width=\textwidth]{emi_figures/figure_paths_emb_sparsehalfcheetah_5.pdf}
+    \caption{Example paths in and our state embeddings for \textit{SparseHalfCheetah}. Note that we did not use any dimensionality reduction techniques.}
+  \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Learned EMI embeddings}
+  \begin{figure}[h]
+    \centering
+    \includegraphics<1>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_1.pdf}
+    \includegraphics<2>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_2.pdf}
+    \includegraphics<3>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_3.pdf}
+    \includegraphics<4>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_4.pdf}
+    \includegraphics<5>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_5.pdf}
+    \includegraphics<6>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_6.pdf}
+    \includegraphics<7>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_7.pdf}
+    \includegraphics<8>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_8.pdf}
+    \includegraphics<9>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_9.pdf}
+    \includegraphics<10>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_10.pdf}
+    \includegraphics<11>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_11.pdf}
+    \caption{Example paths in and our state embeddings for \textit{Montezuma's Revenge}. Note that we did not use any dimensionality reduction techniques.}
+  \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Learned EMI embeddings}
+  \begin{figure}[h]
+    \centering
+    \includegraphics<1>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_1.pdf}
+    \includegraphics<2>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_2.pdf}
+    \includegraphics<3>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_3.pdf}
+    \includegraphics<4>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_4.pdf}
+    \includegraphics<5>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_5.pdf}
+    \includegraphics<6>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_6.pdf}
+    \includegraphics<7>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_7.pdf}
+    \includegraphics<8>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_8.pdf}
+    \includegraphics<9>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_9.pdf}
+    \includegraphics<10>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_10.pdf}
+    \includegraphics<11>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_11.pdf}
+    \caption{Example paths in and our state embeddings for \textit{Frostbite}. Note that we did not use any dimensionality reduction techniques.}
+  \end{figure}
+\end{frame}
+
+%------------------------------------------------
+\begin{frame}
+\frametitle{Sample videos}
+  \begin{itemize} \itemsep=30pt
+      \item A sample video of the EMI agent in \textit{SwimmerGather}: \url{https://youtu.be/HYJBcblCX50}.
+      \item A sample video of the EMI agent in \textit{Montezuma's Revenge}: \url{https://youtu.be/pGun3EwaHug}.
+  \end{itemize}
+\end{frame}
+
+%------------------------------------------------
+%%\subsection{Conclusion} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Conclusion}
+  \begin{itemize} \itemsep=16pt
+      \item We presented EMI, which is an exploration method that constructs embedding representation of states and actions that \textbf{does not rely on generative decoding of the full observation} that extracts predictive signals that can be used to guide exploration.\pause
+      \item Our results on challenging tasks with sparse rewards show that EMI transfers to \textbf{a wide range of tasks}.
+  \end{itemize}
+\end{frame}
+
+
 \section{Learning Discrete and Continuous Factors of Data via Alternating Disentanglement}
-\subsection{Intro}
+%%\subsection{Intro}
 \setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!15!bg}
 \setbeamercolor{block title}{use=structure,fg=white,bg=structure.fg!75!black}
 
@@ -185,7 +650,7 @@
 \end{itemize}
 \end{frame}
 
-\subsection{Method}
+%%\subsection{Method}
 \begin{frame}
 \frametitle{$\beta$-VAE framework}
 \begin{itemize}\itemsep=20pt
@@ -423,7 +888,7 @@ where $u_\theta^{(i)}$ denotes the vector of the  likelihood $\log p_\theta(x^{(
 \end{figure}
 \end{frame} 
 
-\subsection{Experiments}
+%%\subsection{Experiments}
 \begin{frame}
 \frametitle{Pseudocode}
 \begin{algorithm}[H]
@@ -764,7 +1229,7 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 \end{figure}
 \end{frame}
 
-\subsection{Conclusion}
+%%\subsection{Conclusion}
 
 \begin{frame}
 \frametitle{Conclusion}
@@ -783,7 +1248,7 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
 
 \section{Parsimonious black-box adversarial attacks via efficient combinatorial optimization}
 
-\subsection{Background} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%%\subsection{Background} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
 %------------------------------------------------
 \setbeamercolor{block title}{use=structure,fg=white,bg=structure.fg!75!black}
 \setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!15!bg}
@@ -813,7 +1278,7 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
     \includegraphics[scale=0.20]{figures/adversarial_example_stop_sign.png}
     \label{fig:adversarial_example}
 \end{figure}
-\blfootnote{\scriptsize https://www.pluribus-one.it/research/sec-ml/wild-patterns/}
+\footnote{\scriptsize https://www.pluribus-one.it/research/sec-ml/wild-patterns/}
 \end{frame}
 
 \begin{frame}
@@ -871,8 +1336,8 @@ CascadeVAE &10&81.41 (9.54)& \textbf{97.31}\\
     \[x^{t+1} = \Pi_{x+\epsilon}(x^t+\alpha \sign (\nabla_x \ell(\theta, x^t, y))\]
 \end{itemize}
 
-\blfootnote{\scriptsize Ian Goodfellow et al., \textit{Explaining and Harnessing Adversarial Examples, 2015}}
-\blfootnote{\scriptsize Madry et al., \textit{Towards deep learning models resistent to adversarial attack, 2017}}
+\footnote{\scriptsize Ian Goodfellow et al., \textit{Explaining and Harnessing Adversarial Examples, 2015}}
+\footnote{\scriptsize Madry et al., \textit{Towards deep learning models resistent to adversarial attack, 2017}}
 \end{frame}
 
 \begin{frame}
@@ -903,7 +1368,7 @@ Recent methods mostly aim at \textbf{estimating the true gradient signal} based 
 \end{itemize}
 \end{frame}
 
-\subsection{Problem formulation}
+%%\subsection{Problem formulation}
 
 \begin{frame}
     \frametitle{Objective}
@@ -1001,7 +1466,7 @@ where $\mathcal{V}$ denotes the set of all pixel locations, $\mathcal{S}$ denote
 \end{itemize}
 \end{frame}
 
-\subsection{Method}
+%%\subsection{Method}
 
 \begin{frame}
 \frametitle{Submodular function}
@@ -1044,7 +1509,7 @@ A function $F:2^{\mathcal{V}} \rightarrow \reals$ is submodular if for every $\m
 \begin{frame}
 \frametitle{Local search algorithm}
 \begin{itemize}\itemsep=10pt
-    \item For non-monotone set functions, \textbf{local search algorithm}\blfootnote{Feige, et al., \textit{Maximizing non-monotone submodular functions, 2011}} performs better than standard greedy insertion algorithms.\pause
+    \item For non-monotone set functions, \textbf{local search algorithm}\footnote{Feige, et al., \textit{Maximizing non-monotone submodular functions, 2011}} performs better than standard greedy insertion algorithms.\pause
     \item The algorithm alternates between greedily inserting an element and removing an element while the marginal gain is strictly positive.\pause
 \end{itemize}
 \setcounter{algorithm}{0}
@@ -1220,7 +1685,7 @@ x_{adv} \triangleq x + \epsilon \sum_{i \in \mathcal{S}}e_i - \epsilon \sum_{i \
     \end{figure}
 \end{frame}
 
-\subsection{Experiments}
+%%\subsection{Experiments}
 
 \begin{frame}
     \frametitle{Cifar-10}
@@ -1628,7 +2093,7 @@ x_{adv} \triangleq x + \epsilon \sum_{i \in \mathcal{S}}e_i - \epsilon \sum_{i \
 \end{frame}
 
 
-\subsection{Conclusion}
+%%\subsection{Conclusion}
 
 \begin{frame}
     \frametitle{Conclusion}
@@ -1638,470 +2103,6 @@ x_{adv} \triangleq x + \epsilon \sum_{i \in \mathcal{S}}e_i - \epsilon \sum_{i \
     \end{itemize}
 \end{frame}
 
-\section{EMI: Exploration with Mutual Information}
-\subsection{Background} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Reinforcement Learning}
-  \textbf{Reinforcement Learning} is learning by interacting with environments.
-
-  \begin{itemize} \itemsep=6pt
-      \item Learn from consequences of actions.
-      \item Receives reinforcement signal (reward).
-      \item Seeks to maximize accumulated reward.
-  \end{itemize}
-  \begin{figure}[h]
-        \centering
-          \includegraphics[width=0.7\textwidth]{emi_figures/mk_intro}
-  \end{figure}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Reinforcement learning objective}
-
-	Let $\pi$ denote a stochastic policy $\pi : S \times A \rightarrow [0, 1]$, and let $\eta(\pi)$ denote its expected discounted reward:
-	\begin{align*}
-	&\eta(\pi) = \mathbb{E}_{s_0, a_0, \cdots} \left[ \sum_{t=0}^{\infty} \gamma^t r(s_t) \right], \text{where} \\
-	&\quad s_0 \sim \rho_0(s_0), a_t \sim \pi(a_t | s_t), s_{t+1} \sim P(s_{t+1} | s_t, a_t).
-	\end{align*}
-  \begin{figure}[h]
-        \centering
-          \includegraphics[width=0.7\textwidth]{emi_figures/pg_policy}
-          \caption{Example policy network of Atari 2600 Pong.}
-  \end{figure}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Sparse reward environments}
-  \begin{itemize} \itemsep=6pt
-      \item It is hard to learn policy in sparse reward environments.
-      \item How can we explore sparse reward environments efficiently?
-  \end{itemize}
-
-  \begin{figure}[h]
-        \centering
-          \includegraphics[width=0.3\textwidth]{emi_figures/bc_montezuma}
-          \caption{Agent should move in $1 \rightarrow 2 \rightarrow 3 \rightarrow 4 \rightarrow 5 \rightarrow 6$ to get the reward signal.}
-  \end{figure}
-\end{frame}
-
-%------------------------------------------------
-
-\subsection{Methods} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Intuition}
-  \begin{itemize} \itemsep=6pt
-      \item Construct \textbf{the embedding representations} of the observation and action.
-      \item Measure \textbf{the novelty} of encountering states with embedding representations.
-  \end{itemize}
-  \pause
-
-  \begin{figure}[h]
-        \centering
-          \includegraphics[width=0.7\textwidth]{emi_figures/figure_embedding_concept}
-          \caption{Visualization of a sample trajectory in our learned embedding space.}
-  \end{figure}
-
-\end{frame}
-
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Learn embedding representations}
-
-Learn embedding of states $\phi_\alpha : \mathcal{S} \rightarrow \reals^d$ and actions $\psi_\beta: \mathcal{A} \rightarrow \reals^d$.
-\vspace{1em}
-
-\begin{enumerate} \itemsep=12pt
-\item Given $[\phi_\alpha(s); \psi_\beta(a)]$, the uncertainty of the embedding representation of the corresponding next states $\phi_\alpha(s')$ should be minimal and vice versa. \pause
-
-\item Given $[\phi_\alpha(s); \phi_\alpha(s')]$, the uncertainty of the embedding representation of the corresponding actions $\psi_\beta(a)$ should also be minimal and vice versa.
-
-\end{enumerate}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Learn embedding representations}
-
-Learn embedding of states $\phi_\alpha : \mathcal{S} \rightarrow \reals^d$ and actions $\psi_\beta: \mathcal{A} \rightarrow \reals^d$.
-
-\begin{align}
-\text{1. }\maximize_{\alpha, \beta}~ \mathcal{I}_S(\alpha, \beta) &:= \mathcal{I}([\phi_\alpha(s); \psi_\beta(a)]; \phi_\alpha(s')) \nonumber \\
-&= \mathcal{D}_{\text{KL}}\left(\mathbb{P}_{SAS'}^\pi \parallel \mathbb{P}_{SA}^\pi \otimes \mathbb{P}_{S'}^\pi\right) \nonumber
-%\label{eqn:infogain_s}
-\end{align}\pause
-\vspace{-1em}
-\begin{align}
-\text{2. }\maximize_{\alpha, \beta}~ \mathcal{I}_A(\alpha, \beta) &:= \mathcal{I}([\phi_\alpha(s); \phi_\alpha(s')]; \psi_\beta(a)) \nonumber \\
-&= \mathcal{D}_{\text{KL}}\left(\mathbb{P}_{SAS'}^\pi \parallel \mathbb{P}_{SS'}^\pi \otimes \mathbb{P}_A^\pi\right) \nonumber
-%\label{eqn:infogain_a}
-\end{align}
-
-\end{frame}
-
-%------------------------------------------------
-\begin{frame}
-\begin{thm}\label{thm:emi_js}
-The lower bound of mutual information using Jensen-Shannon divergence:
-\begin{align*}
-    \mathcal{I}^{(\text{JSD})}(X; Z) &\geq \sup_{\omega \in \Omega} 
-    \mathbb{E}_{\mathbb{P}_{XZ}} \left[-\text{sp} \left(-T_{\omega}(x,z)\right)\right] \\
-    & - \mathbb{E}_{\mathbb{P}_{X} \otimes \mathbb{P}_Z} \left[ \text{sp} \left(T_{\omega}(x,z)\right)\right]+\log(4)
-\end{align*}
-\end{thm}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\begin{proof}
-\begin{align*}
-    &\mathcal{I}^{(\text{JSD})}(X; Z) = \mathcal{D}_\text{JSD}(\mathbb{P}_{XZ} \parallel \mathbb{P}_{X} \otimes \mathbb{P}_Z)\nonumber\\
-    &\geq \sup_{\omega \in \Omega} \mathbb{E}_{\mathbb{P}_{XZ}} \left[S_\omega(x,z)\right] - \mathbb{E}_{\mathbb{P}_{X} \otimes \mathbb{P}_Z} \left[\text{JSD}^{*}\left(S_\omega(x,z)\right)\right] \nonumber\\
-    &= \sup_{\omega \in \Omega} \mathbb{E}_{\mathbb{P}_{XZ}} \left[-\text{sp} \left(-T_{\omega}(x,z)\right)\right] \nonumber \\ 
-    & \qquad \quad - \mathbb{E}_{\mathbb{P}_{X} \otimes \mathbb{P}_Z} \left[ \text{sp} \left(T_{\omega}(x,z)\right)\right] +\log(4),
-\end{align*}
-where the inequality in the second line holds from the definition of $f$-divergence. In the third line, we substituted $S_\omega(x,z) = \log(2) - \log(1+\exp(-T_\omega(x,z)))$ and \textit{Fenchel conjugate} of Jensen-Shannon divergence, $\text{JSD}^{*}(t) = -\log(2-\exp(t))$.
-\end{proof}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Learn embedding representations}
-
-Learn embedding of states $\phi_\alpha : \mathcal{S} \rightarrow \reals^d$ and actions $\psi_\beta: \mathcal{A} \rightarrow \reals^d$.
-
-
-\begin{align} 
-%\label{eqn:infogain_s_jsd}
-\text{1. }\maximize_{\alpha, \beta}&~ \mathcal{I}^{\text{(JSD)}}_S(\alpha, \beta) \nonumber \\
-\geq& \maximize_{\alpha, \beta}  \sup_{\omega_S \in \Omega_S}\mathbb{E}_{\mathbb{P}_{SAS'}^\pi} \left[-\text{sp} \left(-T_{\omega_S}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(s'))\right)\right] \nonumber \\
-& -\mathbb{E}_{\mathbb{P}_{SA}^\pi \otimes \mathbb{P}_{S'}^\pi} \left[ \text{sp} \left(T_{\omega_S}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(\tilde{s'}))\right)\right] + \log{4} \nonumber
-\end{align}\pause
-\begin{align}
-%\label{eqn:infogain_a_jsd}
-\text{2. }\maximize_{\alpha, \beta}&~ \mathcal{I}^{\text{(JSD)}}_A(\alpha, \beta) \nonumber \\
-\geq& \maximize_{\alpha, \beta}  \sup_{\omega_A \in \Omega_A} \mathbb{E}_{\mathbb{P}_{SAS'}^\pi} \left[-\text{sp} \left(-T_{\omega_A}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(s'))\right)\right] \nonumber \\
-& -\mathbb{E}_{\mathbb{P}_{SS'}^\pi \otimes \mathbb{P}_{A}^\pi} \left[ \text{sp} \left(T_{\omega_A}(\phi_\alpha(s), \psi_\beta(\tilde{a}), \phi_\alpha(s'))\right)\right] +\log{4} \nonumber
-\end{align}
-
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Architecture of EMI}
-  \vspace{2em}
-  \hspace*{-2em} \includegraphics[width=0.95\paperwidth]{emi_figures/arch_diagram}
-  \vspace{-1em}
-  \begin{figure}
-      \caption{Computational architecture for estimating $\mathcal{I}^{\text{(JSD)}}_S$ and $\mathcal{I}^{\text{(JSD)}}_A$ for image-based observations.}
-  \end{figure}
-
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Linear dynamics model with error model}
-\begin{itemize} \itemsep=12pt
-\item Learn $\phi(s)$ and $\psi(a)$ such that $\phi(s')$ follow linear dynamics \ie~ $\phi(s') = \phi(s) + \psi(a)$.
-\item Offload irreducible error to the error model $S_\gamma : \mathcal{S} \times \mathcal{A} \rightarrow \reals^d$.
-\end{itemize}
-
-\begin{align}
-&\minimize_{\alpha, \beta, \gamma} \underbrace{\| S_\gamma \|_{2,0}}_{\text{error minimization}} \nonumber\\
-&\text{\ subject to }~~ \underbrace{\Phi_{\alpha}' = \Phi_\alpha + \Psi_\beta + S_\gamma}_{\text{embedding linear dynamics}}, \nonumber
-%\label{eqn:sparse}
-\end{align}
-
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Learning objective}
-
-\begin{align} 
-\minimize_{\alpha, \beta, \gamma} ~ &\|\Phi'_\alpha - \left( \Phi_\alpha + \Psi_\beta  + S_\gamma \right)\|_F^2 \nonumber\\
-&+ \lambda_{\text{error}} \| S_\gamma \|_F^2
-+ \lambda_\text{info} \mathcal{L}_\text{info}, \nonumber
-\end{align}
-%\vspace{-5em}
-\begin{align}
-\text{where, }\mathcal{L}_\text{info} &= \inf_{\omega_S \in \Omega_S} \mathbb{E}_{\mathbb{P}_{SAS'}^\pi} \text{sp} \left(-T_{\omega_S}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(s'))\right) \nonumber \\
-&\qquad \quad + \mathbb{E}_{\mathbb{P}_{SA}^\pi \otimes \mathbb{P}_{S'}^\pi} ~\text{sp} \left(T_{\omega_S}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(\tilde{s'}))\right) \nonumber \\
-&+ \inf_{\omega_A \in \Omega_A} \mathbb{E}_{\mathbb{P}_{SAS'}^\pi} \text{sp} \left(-T_{\omega_A}(\phi_\alpha(s), \psi_\beta(a), \phi_\alpha(s'))\right) \nonumber \\
-&\qquad \quad + \mathbb{E}_{\mathbb{P}_{SS'}^\pi \otimes \mathbb{P}_{A}^\pi} ~\text{sp} \left(T_{\omega_A}(\phi_\alpha(s), \psi_\beta(\tilde{a}), \phi_\alpha(s'))\right) \nonumber
-\end{align}
-
-
-\end{frame}
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Intrinsic reward augmentation}
-Measure the novelty with prediction error under the linear dynamics model and use it as intrinsic reward.
-\begin{align}
-\hspace{-0.5em}  r_i(s_t, a_t, s_t') = \|\phi(s_t) + \psi(a_t) + S(s_t, a_t) - \phi(s_t')\|^2 \nonumber
-%\label{eqn:ir_err}
-\end{align}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Pseudocode}
-  \begin{figure}[h]
-        \centering
-          \includegraphics[width=0.7\textwidth]{emi_figures/emi_alg}
-  \end{figure}
-\end{frame}
-
-%------------------------------------------------
-
-\subsection{Experiments} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Baselines}
-  \begin{itemize} \itemsep=12pt
-    \item We compare EMI with five exploration baselines on top of TRPO\footnote{{\color{blue} J. Schulman, S. Levine, P. Abbeel, M. Jordan, and P. Moritz.} ``Trust region policy optimization''. \textcolor{gray}{ICML2015.}}.
-    \uncover<2->{\item EX2\footnote<2->{{\color{blue} J. Fu, J. Co-Reyes, and S. Levine.} ``Ex2: Exploration with exemplar models for deep reinforcement learning''. \textcolor{gray}{NIPS2017.}} trains an ensemble model to estimate state visitation densities, and leads the agent to rarely visited states.}
-    \uncover<3->{\item ICM\footnote<3->{{\color{blue} D. Pathak, P. Agrawal, A. Efros, and T. Darrell.} ``Curiosity-driven exploration by self-supervised prediction''. \textcolor{gray}{ICML2017.}} forms forward and inverse dynamics models and uses prediction errors as exploration signals.}
-  \end{itemize}
-
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Baselines}
-  \begin{itemize} \itemsep=12pt
-    \item RND\footnote{{\color{blue} Y. Burda, H. Edwards, A. Storkey, and O. Klimov.} ``Exploration by random network distillation''. \textcolor{gray}{ICLR2019.}} trains a network to predict the output of a fixed randomly initialized network and employs the prediction errors for exploration.
-    \renewcommand*{\thefootnote}{\fnsymbol{footnote}}\footnotetext<2->{\label{noteFinalPerformanceOnly}For final performance comparison only.}\renewcommand*{\thefootnote}{\arabic{footnote}}
-    \uncover<2->{\item AE-SimHash\footnote<2->{{\color{blue} H. Tang, R. Houthooft, D. Foote, A. Stooke, X. Chen, Y. Duan,  J. Schulman, F. De Turck, and P. Abbeel.} ``\# Exploration: A study of count-based exploration for deep reinforcement learning''. \textcolor{gray}{NIPS2017.}}\textsuperscript{\ref{noteFinalPerformanceOnly}} computes hash codes for input states by training an autoencoder, and generates count-based exploration signals with the hash codes.}
-    \uncover<3->{\item VIME\footnote<3->{{\color{blue} R. Houthooft, X. Chen, Y. Duan, J. Schulman, F. De Turck, and P. Abbeel.} ``Vime: Variational information maximizing exploration''. \textcolor{gray}{NIPS2016.}}\textsuperscript{\ref{noteFinalPerformanceOnly}} approximates the environment dynamics and uses the information gain of the learned dynamics model as intrinsic rewards.}
-  \end{itemize}
-\end{frame}
-
-%------------------------------------------------
-\begin{frame}
-\frametitle{Environments}
-  \begin{itemize} \itemsep=6pt
-    \item Use sparse-reward environments to evaluate and compare the exploration capabilities of the baseline methods and EMI.
-    \item \textit{SwimmerGather} and \textit{SparseHalfCheetah} from MuJoCo for locomotion tasks with continuous control.
-    \item Six Atari environments, \textit{Freeway}, \textit{Frostbite}, \textit{Venture}, \textit{Montezuma's Revenge}, \textit{Gravitar}, and \textit{Solaris} from Arcade Learning Environment for vision-based tasks with discrete control.
-  \end{itemize}
-  \pause
-  \vspace{1em}
-  
-  \begin{figure}[h]
-    \centering
-    \begin{subfigure}[t]{0.3\textwidth}
-        \centering
-        \includegraphics[height=7em,right]{emi_figures/env_image_SwimmerGather.png}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.3\textwidth}
-        \centering
-        \includegraphics[height=7em,center]{emi_figures/env_image_MontezumaRevenge.png}
-    \end{subfigure}
-    \begin{subfigure}[t]{0.3\textwidth}
-        \centering
-        \includegraphics[height=7em,left]{emi_figures/env_image_Venture.png}
-    \end{subfigure}
-    \caption{Example scenes from \textit{SwimmerGather} (left), \textit{Montezuma's Revenge} (middle), and \textit{Venture} (right).}
-  \end{figure}
-
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Comparison of average returns}
-  \begin{figure}[ht!]
-      \centering
-      \begin{subfigure}{0.32\textwidth}
-          \includegraphics[width=\textwidth]{emi_figures/SwimmerGather_all.pdf}
-          \caption{\textit{SwimmerGather}}
-      \end{subfigure}
-      \begin{subfigure}{0.32\textwidth}
-          \includegraphics[width=\textwidth]{emi_figures/SparseHalfCheetah_all.pdf}
-          \caption{\textit{SparseHalfCheetah}}
-      \end{subfigure}
-      \begin{subfigure}{0.32\textwidth}
-          \includegraphics[width=\textwidth]{emi_figures/SparseHalfCheetah_ablate_loss.pdf}
-   	      \caption{Ablation study}
-      \end{subfigure}
-      \caption{(a), (b): Performance of EMI on locomotion tasks with sparse rewards compared to baseline methods. The solid lines show the mean reward (y-axis) of 5 different seeds at each iteration (x-axis) and the shaded area represents one standard deviation from the mean. (c): Ablation result on \textit{SparseHalfCheetah}.}
-  \end{figure}
-\end{frame}
-
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Comparison of average returns}
-\begin{figure}[ht!]
-  \resizebox{0.8\columnwidth}{!}{
-    \centering
-    \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{emi_figures/Freeway_all.pdf}
-        \caption{\textit{Freeway}}
-    \end{subfigure}
-    \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{emi_figures/Frostbite_all.pdf}
-        \caption{\textit{Frostbite}}
-    \end{subfigure}
-    \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{emi_figures/Venture_all.pdf}
-        \caption{\textit{Venture}}
-    \end{subfigure}
-  }
-    
-  \resizebox{0.8\columnwidth}{!}{
-    \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{emi_figures/Gravitar_all.pdf}
-        \caption{\textit{Gravitar}}
-    \end{subfigure}
-    \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{emi_figures/Solaris_all.pdf}
-        \caption{\textit{Solaris}}
-    \end{subfigure}
-    \begin{subfigure}{0.32\textwidth}
-        \includegraphics[width=\textwidth]{emi_figures/MontezumaRevenge_all.pdf}
-        \caption{\textit{Montezuma's Revenge}}
-    \end{subfigure}
-  }
-  \caption{Performance of EMI on sparse reward Atari environments compared to the baseline methods. The solid lines show the mean reward (y-axis) of 5 different seeds at each iteration (x-axis).}
-\end{figure}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Comparison of final performance}
-\begin{table}[ht!]
-\resizebox{\columnwidth}{!}{
-\begin{tabular}{ |p{2.8cm}| >{\centering\arraybackslash}p{1.5cm} | >{\centering\arraybackslash}p{1.5cm}|  >{\centering\arraybackslash}p{1.5cm} | >{\centering\arraybackslash}p{1.5cm} | >{\centering\arraybackslash}p{2cm} | >{\centering\arraybackslash}p{1.5cm} | >{\centering\arraybackslash}p{1.5cm} |}
-\hline
-& EMI & EX2 & ICM  & RND & AE-SimHash & VIME & TRPO  \\
-\hline
-SwimmerGather& \textbf{0.438}& 0.200& 0 & 0 & 0.258& 0.196& 0\\
-SparseHalfCheetah& \textbf{218}& 153.7& 1.4& 3.36 & 0.5& 98.0& 0\\
-\hline
-Freeway & \textbf{33.8}& 27.1& 33.6& 33.3 & 33.5& -& 26.7\\
-
-Frostbite & \textbf{7002}& 3387& 4465& 2227 & 5214& -& 2034\\
-
-Venture & 646 & 589& 418& \textbf{707} & 445& -& 263\\
-
-Gravitar & \textbf{558}& 550& 424& 546 & 482& -& 508\\
-
-Solaris & 2688& 2276& 2453& 2051 & \textbf{4467}& -& 3101\\
-
-Montezuma & \textbf{387}& 0& 161& 377 & 75& -& 0\\
-\hline
-
- \hline
-\end{tabular}
-}
-\caption{Mean reward comparison with baseline methods. We compare EMI with EX2, ICM, RND, AE-SimHash, VIME, and vanilla TRPO. The EMI, EX2, ICM, RND, and TRPO columns show the mean reward of 5 different seeds. The AE-SimHash and VIME columns show the results from the original papers. The results of MuJoCo experiments are reported at 5M and 100M time steps respectively. The results of Atari experiments are reported at 50M time steps.}
-\end{table}
-\end{frame}
-
-
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Learned EMI embeddings}
-  \begin{figure}[h]
-    \centering
-    \includegraphics<1>[width=\textwidth]{emi_figures/figure_paths_emb_sparsehalfcheetah_1.pdf}
-    \includegraphics<2>[width=\textwidth]{emi_figures/figure_paths_emb_sparsehalfcheetah_2.pdf}
-    \includegraphics<3>[width=\textwidth]{emi_figures/figure_paths_emb_sparsehalfcheetah_3.pdf}
-    \includegraphics<4>[width=\textwidth]{emi_figures/figure_paths_emb_sparsehalfcheetah_4.pdf}
-    \includegraphics<5>[width=\textwidth]{emi_figures/figure_paths_emb_sparsehalfcheetah_5.pdf}
-    \caption{Example paths in and our state embeddings for \textit{SparseHalfCheetah}. Note that we did not use any dimensionality reduction techniques.}
-  \end{figure}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Learned EMI embeddings}
-  \begin{figure}[h]
-    \centering
-    \includegraphics<1>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_1.pdf}
-    \includegraphics<2>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_2.pdf}
-    \includegraphics<3>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_3.pdf}
-    \includegraphics<4>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_4.pdf}
-    \includegraphics<5>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_5.pdf}
-    \includegraphics<6>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_6.pdf}
-    \includegraphics<7>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_7.pdf}
-    \includegraphics<8>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_8.pdf}
-    \includegraphics<9>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_9.pdf}
-    \includegraphics<10>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_10.pdf}
-    \includegraphics<11>[width=\textwidth]{emi_figures/figure_paths_emb_montezuma_11.pdf}
-    \caption{Example paths in and our state embeddings for \textit{Montezuma's Revenge}. Note that we did not use any dimensionality reduction techniques.}
-  \end{figure}
-\end{frame}
-
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Learned EMI embeddings}
-  \begin{figure}[h]
-    \centering
-    \includegraphics<1>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_1.pdf}
-    \includegraphics<2>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_2.pdf}
-    \includegraphics<3>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_3.pdf}
-    \includegraphics<4>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_4.pdf}
-    \includegraphics<5>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_5.pdf}
-    \includegraphics<6>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_6.pdf}
-    \includegraphics<7>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_7.pdf}
-    \includegraphics<8>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_8.pdf}
-    \includegraphics<9>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_9.pdf}
-    \includegraphics<10>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_10.pdf}
-    \includegraphics<11>[width=\textwidth]{emi_figures/figure_paths_emb_frostbite_11.pdf}
-    \caption{Example paths in and our state embeddings for \textit{Frostbite}. Note that we did not use any dimensionality reduction techniques.}
-  \end{figure}
-\end{frame}
-
-%------------------------------------------------
-\begin{frame}
-\frametitle{Sample videos}
-  \begin{itemize} \itemsep=30pt
-      \item A sample video of the EMI agent in \textit{SwimmerGather}: \url{https://youtu.be/HYJBcblCX50}.
-      \item A sample video of the EMI agent in \textit{Montezuma's Revenge}: \url{https://youtu.be/pGun3EwaHug}.
-  \end{itemize}
-\end{frame}
-
-%------------------------------------------------
-\subsection{Conclusion} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
-%------------------------------------------------
-
-\begin{frame}
-\frametitle{Conclusion}
-  \begin{itemize} \itemsep=16pt
-      \item We presented EMI, which is an exploration method that constructs embedding representation of states and actions that \textbf{does not rely on generative decoding of the full observation} that extracts predictive signals that can be used to guide exploration.\pause
-      \item Our results on challenging tasks with sparse rewards show that EMI transfers to \textbf{a wide range of tasks}.
-  \end{itemize}
-\end{frame}
 
 \end{document}
 
